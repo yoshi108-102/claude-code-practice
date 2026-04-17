@@ -2,27 +2,30 @@
 
 ## 目的
 
-Claude Code 学習プロジェクト。公式 docs/reference（全114ページ）を網羅しつつ、Phase ごとに実際の成果物（CLAUDE.md → skill → hook → subagent → plugin → MCP サーバー → Agent SDK エージェント）を作りながら、基礎から高度な統合までを5 Phaseで学ぶ。
+Claude Code 学習プロジェクト。公式 docs/reference（全114ページ）を網羅しながら、Phase ごとに成果物を作って基礎から統合までを 5 Phase で学ぶ。
 
-## 最重要ルール
+## 最重要ルール（IMPORTANT: 毎セッション守ること）
 
-- **公式 docs/reference に沿って進める**: 各 Task は公式ページを根拠にする。Phase 終了時にそのPhaseの担当ページを全て読み終わっている状態にする
-- **学習終了時に全114ページに触れる**: `plans/claude-code-learning-phases-design.md` の URL チェックリストで進捗管理
-- **勝手に実装を進めない**: 各ステップで 解説 → ユーザー確認 → 実装 の順を守る
-- **質疑応答は docs に残す**: `docs/learning/phase{N}/task{M}/` にトピック別 md で記録
-- **reference は別 md**: 深掘り情報は `reference/` ディレクトリに分離
+- **YOU MUST: 勝手に実装を進めない**。各ステップで「解説 → ユーザー確認 → 実装 → 振り返り」の順を守る。ユーザーが「進めて」と明示するまで次に進まない
+- **公式 docs/reference に沿って進める**。各 Task の冒頭で該当ページを WebFetch で読み、解説の末尾に出典 URL を必ず書く
+- **脱線トピックには Phase ラベルを明示**。例「これは Phase 4 で本格扱いです」
+- **学習終了時に全114ページに触れる**。読了した URL は `plans/claude-code-learning-phases-design.md` の checklist で `[x]` に更新
 
-## 現在の進捗
+## docs 取得時の URL 形式
 
-Phase 1 の学習準備段階。詳細は `docs/LEARNING_CONTEXT.md` を参照。
+- 人間向け canonical: `https://code.claude.com/docs/en/<slug>`（**`.md` を付けない**）
+- LLM 用 raw markdown: `https://code.claude.com/docs/en/<slug>.md`（CSS なし、リンクでユーザーに渡すと壊れる。WebFetch 用途のみ）
+- 全ページインデックス: `https://code.claude.com/docs/llms.txt`
 
-## ドキュメント構成
+## 学習ノートの保存規則
 
-- `plans/` — Phase 設計書、Task 実装計画
-- `docs/learning/` — 学習ノート（Phase/Task 別）
-- `docs/LEARNING_CONTEXT.md` — 学習フローの全体像、進捗、ドキュメントルール
+- トピック別ノート: `docs/learning/phase{N}/task{M}/NN-<topic>.md`
+- 深掘りリファレンス: `docs/learning/phase{N}/task{M}/reference/<topic>.md`
+- Task ごとの目次: `docs/learning/phase{N}/task{M}/main.md`（読んだ docs の checklist + 振り返りを含む）
+- 各ノートの冒頭に `出典: [page-name](URL)` を必ず書く
 
-## 公式 docs の参照元
+## 関連ドキュメント
 
-- 一次ソース: https://code.claude.com/docs/en/overview
-- 全ページインデックス: https://code.claude.com/docs/llms.txt
+- `plans/claude-code-learning-phases-design.md` — 全 Phase の設計 + URL チェックリスト
+- `docs/LEARNING_CONTEXT.md` — 学習フローの全体像、Phase 進捗テーブル
+- `plans/phase1-implementation.md` 等 — 各 Phase の Task 分割
