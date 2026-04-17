@@ -52,50 +52,50 @@ Claude Code の「何ができるのか」「どう動くのか」を理解し�
 
 #### 導入・概要
 
-- [ ] https://code.claude.com/docs/en/overview.md — Claude Code overview
-- [ ] https://code.claude.com/docs/en/quickstart.md — Quickstart
-- [ ] https://code.claude.com/docs/en/how-claude-code-works.md — How Claude Code works
-- [ ] https://code.claude.com/docs/en/best-practices.md — Best Practices for Claude Code
-- [ ] https://code.claude.com/docs/en/common-workflows.md — Common workflows
-- [ ] https://code.claude.com/docs/en/platforms.md — Platforms and integrations
+- [ ] https://code.claude.com/docs/en/overview — Claude Code overview
+- [ ] https://code.claude.com/docs/en/quickstart — Quickstart
+- [ ] https://code.claude.com/docs/en/how-claude-code-works — How Claude Code works
+- [ ] https://code.claude.com/docs/en/best-practices — Best Practices for Claude Code
+- [ ] https://code.claude.com/docs/en/common-workflows — Common workflows
+- [ ] https://code.claude.com/docs/en/platforms — Platforms and integrations
 
 #### CLI の基本操作
 
-- [ ] https://code.claude.com/docs/en/cli-reference.md — CLI reference
-- [ ] https://code.claude.com/docs/en/commands.md — Commands
-- [ ] https://code.claude.com/docs/en/interactive-mode.md — Interactive mode
-- [ ] https://code.claude.com/docs/en/keybindings.md — Customize keyboard shortcuts
-- [ ] https://code.claude.com/docs/en/voice-dictation.md — Voice dictation
-- [ ] https://code.claude.com/docs/en/fast-mode.md — Speed up responses with fast mode
-- [ ] https://code.claude.com/docs/en/fullscreen.md — Fullscreen rendering
+- [ ] https://code.claude.com/docs/en/cli-reference — CLI reference
+- [ ] https://code.claude.com/docs/en/commands — Commands
+- [ ] https://code.claude.com/docs/en/interactive-mode — Interactive mode
+- [ ] https://code.claude.com/docs/en/keybindings — Customize keyboard shortcuts
+- [ ] https://code.claude.com/docs/en/voice-dictation — Voice dictation
+- [ ] https://code.claude.com/docs/en/fast-mode — Speed up responses with fast mode
+- [ ] https://code.claude.com/docs/en/fullscreen — Fullscreen rendering
 
 #### セットアップと実行基盤
 
-- [ ] https://code.claude.com/docs/en/setup.md — Advanced setup
-- [ ] https://code.claude.com/docs/en/authentication.md — Authentication
-- [ ] https://code.claude.com/docs/en/terminal-config.md — Optimize your terminal setup
-- [ ] https://code.claude.com/docs/en/context-window.md — Explore the context window
-- [ ] https://code.claude.com/docs/en/checkpointing.md — Checkpointing
+- [ ] https://code.claude.com/docs/en/setup — Advanced setup
+- [ ] https://code.claude.com/docs/en/authentication — Authentication
+- [ ] https://code.claude.com/docs/en/terminal-config — Optimize your terminal setup
+- [ ] https://code.claude.com/docs/en/context-window — Explore the context window
+- [ ] https://code.claude.com/docs/en/checkpointing — Checkpointing
 
 #### IDE / Surface
 
-- [ ] https://code.claude.com/docs/en/vs-code.md — Use Claude Code in VS Code
-- [ ] https://code.claude.com/docs/en/jetbrains.md — JetBrains IDEs
-- [ ] https://code.claude.com/docs/en/desktop.md — Use Claude Code Desktop
-- [ ] https://code.claude.com/docs/en/desktop-quickstart.md — Get started with the desktop app
-- [ ] https://code.claude.com/docs/en/claude-code-on-the-web.md — Use Claude Code on the web
-- [ ] https://code.claude.com/docs/en/web-quickstart.md — Get started with Claude Code on the web
-- [ ] https://code.claude.com/docs/en/chrome.md — Use Claude Code with Chrome (beta)
+- [ ] https://code.claude.com/docs/en/vs-code — Use Claude Code in VS Code
+- [ ] https://code.claude.com/docs/en/jetbrains — JetBrains IDEs
+- [ ] https://code.claude.com/docs/en/desktop — Use Claude Code Desktop
+- [ ] https://code.claude.com/docs/en/desktop-quickstart — Get started with the desktop app
+- [ ] https://code.claude.com/docs/en/claude-code-on-the-web — Use Claude Code on the web
+- [ ] https://code.claude.com/docs/en/web-quickstart — Get started with Claude Code on the web
+- [ ] https://code.claude.com/docs/en/chrome — Use Claude Code with Chrome (beta)
 
 #### トラブルシュート・情報源
 
-- [ ] https://code.claude.com/docs/en/troubleshooting.md — Troubleshooting
-- [ ] https://code.claude.com/docs/en/errors.md — Error reference
-- [ ] https://code.claude.com/docs/en/changelog.md — Changelog
-- [ ] https://code.claude.com/docs/en/whats-new/index.md — What's new
-- [ ] https://code.claude.com/docs/en/whats-new/2026-w13.md — Week 13 · March 23–27, 2026
-- [ ] https://code.claude.com/docs/en/whats-new/2026-w14.md — Week 14 · March 30 – April 3, 2026
-- [ ] https://code.claude.com/docs/en/whats-new/2026-w15.md — Week 15 · April 6–10, 2026
+- [ ] https://code.claude.com/docs/en/troubleshooting — Troubleshooting
+- [ ] https://code.claude.com/docs/en/errors — Error reference
+- [ ] https://code.claude.com/docs/en/changelog — Changelog
+- [ ] https://code.claude.com/docs/en/whats-new/index — What's new
+- [ ] https://code.claude.com/docs/en/whats-new/2026-w13 — Week 13 · March 23–27, 2026
+- [ ] https://code.claude.com/docs/en/whats-new/2026-w14 — Week 14 · March 30 – April 3, 2026
+- [ ] https://code.claude.com/docs/en/whats-new/2026-w15 — Week 15 · April 6–10, 2026
 
 ---
 
@@ -125,18 +125,18 @@ CLAUDE.md/auto memory/settings/permissions を使いこなし、プロジェク�
 
 ### 担当 docs URL チェックリスト
 
-- [ ] https://code.claude.com/docs/en/memory.md — How Claude remembers your project
-- [ ] https://code.claude.com/docs/en/claude-directory.md — Explore the .claude directory
-- [ ] https://code.claude.com/docs/en/settings.md — Claude Code settings
-- [ ] https://code.claude.com/docs/en/permissions.md — Configure permissions
-- [ ] https://code.claude.com/docs/en/permission-modes.md — Choose a permission mode
-- [ ] https://code.claude.com/docs/en/env-vars.md — Environment variables
-- [ ] https://code.claude.com/docs/en/model-config.md — Model configuration
-- [ ] https://code.claude.com/docs/en/output-styles.md — Output styles
-- [ ] https://code.claude.com/docs/en/statusline.md — Customize your status line
-- [ ] https://code.claude.com/docs/en/sandboxing.md — Sandboxing
-- [ ] https://code.claude.com/docs/en/server-managed-settings.md — Configure server-managed settings
-- [ ] https://code.claude.com/docs/en/data-usage.md — Data usage
+- [ ] https://code.claude.com/docs/en/memory — How Claude remembers your project
+- [ ] https://code.claude.com/docs/en/claude-directory — Explore the .claude directory
+- [ ] https://code.claude.com/docs/en/settings — Claude Code settings
+- [ ] https://code.claude.com/docs/en/permissions — Configure permissions
+- [ ] https://code.claude.com/docs/en/permission-modes — Choose a permission mode
+- [ ] https://code.claude.com/docs/en/env-vars — Environment variables
+- [ ] https://code.claude.com/docs/en/model-config — Model configuration
+- [ ] https://code.claude.com/docs/en/output-styles — Output styles
+- [ ] https://code.claude.com/docs/en/statusline — Customize your status line
+- [ ] https://code.claude.com/docs/en/sandboxing — Sandboxing
+- [ ] https://code.claude.com/docs/en/server-managed-settings — Configure server-managed settings
+- [ ] https://code.claude.com/docs/en/data-usage — Data usage
 
 ---
 
@@ -163,13 +163,13 @@ CLAUDE.md/auto memory/settings/permissions を使いこなし、プロジェク�
 
 ### 担当 docs URL チェックリスト
 
-- [ ] https://code.claude.com/docs/en/skills.md — Extend Claude with skills
-- [ ] https://code.claude.com/docs/en/hooks-guide.md — Automate workflows with hooks
-- [ ] https://code.claude.com/docs/en/hooks.md — Hooks reference
-- [ ] https://code.claude.com/docs/en/sub-agents.md — Create custom subagents
-- [ ] https://code.claude.com/docs/en/agent-teams.md — Orchestrate teams of Claude Code sessions
-- [ ] https://code.claude.com/docs/en/features-overview.md — Extend Claude Code
-- [ ] https://code.claude.com/docs/en/tools-reference.md — Tools reference
+- [ ] https://code.claude.com/docs/en/skills — Extend Claude with skills
+- [ ] https://code.claude.com/docs/en/hooks-guide — Automate workflows with hooks
+- [ ] https://code.claude.com/docs/en/hooks — Hooks reference
+- [ ] https://code.claude.com/docs/en/sub-agents — Create custom subagents
+- [ ] https://code.claude.com/docs/en/agent-teams — Orchestrate teams of Claude Code sessions
+- [ ] https://code.claude.com/docs/en/features-overview — Extend Claude Code
+- [ ] https://code.claude.com/docs/en/tools-reference — Tools reference
 
 ---
 
@@ -201,52 +201,52 @@ Phase 3 で作った個人用ツールを plugin として整理・配布し、C
 
 #### プラグイン
 
-- [ ] https://code.claude.com/docs/en/plugins.md — Create plugins
-- [ ] https://code.claude.com/docs/en/plugins-reference.md — Plugins reference
-- [ ] https://code.claude.com/docs/en/plugin-marketplaces.md — Create and distribute a plugin marketplace
-- [ ] https://code.claude.com/docs/en/discover-plugins.md — Discover and install prebuilt plugins
-- [ ] https://code.claude.com/docs/en/plugin-dependencies.md — Constrain plugin dependency versions
+- [ ] https://code.claude.com/docs/en/plugins — Create plugins
+- [ ] https://code.claude.com/docs/en/plugins-reference — Plugins reference
+- [ ] https://code.claude.com/docs/en/plugin-marketplaces — Create and distribute a plugin marketplace
+- [ ] https://code.claude.com/docs/en/discover-plugins — Discover and install prebuilt plugins
+- [ ] https://code.claude.com/docs/en/plugin-dependencies — Constrain plugin dependency versions
 
 #### CI/CD
 
-- [ ] https://code.claude.com/docs/en/github-actions.md — Claude Code GitHub Actions
-- [ ] https://code.claude.com/docs/en/gitlab-ci-cd.md — Claude Code GitLab CI/CD
-- [ ] https://code.claude.com/docs/en/github-enterprise-server.md — Claude Code with GitHub Enterprise Server
-- [ ] https://code.claude.com/docs/en/code-review.md — Code Review
+- [ ] https://code.claude.com/docs/en/github-actions — Claude Code GitHub Actions
+- [ ] https://code.claude.com/docs/en/gitlab-ci-cd — Claude Code GitLab CI/CD
+- [ ] https://code.claude.com/docs/en/github-enterprise-server — Claude Code with GitHub Enterprise Server
+- [ ] https://code.claude.com/docs/en/code-review — Code Review
 
 #### Collaboration / Surface
 
-- [ ] https://code.claude.com/docs/en/slack.md — Claude Code in Slack
-- [ ] https://code.claude.com/docs/en/channels.md — Push events into a running session with channels
-- [ ] https://code.claude.com/docs/en/channels-reference.md — Channels reference
-- [ ] https://code.claude.com/docs/en/remote-control.md — Continue local sessions from any device with Remote Control
+- [ ] https://code.claude.com/docs/en/slack — Claude Code in Slack
+- [ ] https://code.claude.com/docs/en/channels — Push events into a running session with channels
+- [ ] https://code.claude.com/docs/en/channels-reference — Channels reference
+- [ ] https://code.claude.com/docs/en/remote-control — Continue local sessions from any device with Remote Control
 
 #### Scheduling & Automation
 
-- [ ] https://code.claude.com/docs/en/routines.md — Automate work with routines
-- [ ] https://code.claude.com/docs/en/desktop-scheduled-tasks.md — Schedule recurring tasks in Desktop
-- [ ] https://code.claude.com/docs/en/scheduled-tasks.md — Run prompts on a schedule
-- [ ] https://code.claude.com/docs/en/headless.md — Run Claude Code programmatically
-- [ ] https://code.claude.com/docs/en/computer-use.md — Let Claude use your computer from the CLI
+- [ ] https://code.claude.com/docs/en/routines — Automate work with routines
+- [ ] https://code.claude.com/docs/en/desktop-scheduled-tasks — Schedule recurring tasks in Desktop
+- [ ] https://code.claude.com/docs/en/scheduled-tasks — Run prompts on a schedule
+- [ ] https://code.claude.com/docs/en/headless — Run Claude Code programmatically
+- [ ] https://code.claude.com/docs/en/computer-use — Let Claude use your computer from the CLI
 
 #### 運用・セキュリティ
 
-- [ ] https://code.claude.com/docs/en/analytics.md — Track team usage with analytics
-- [ ] https://code.claude.com/docs/en/monitoring-usage.md — Monitoring
-- [ ] https://code.claude.com/docs/en/costs.md — Manage costs effectively
-- [ ] https://code.claude.com/docs/en/security.md — Security
-- [ ] https://code.claude.com/docs/en/legal-and-compliance.md — Legal and compliance
-- [ ] https://code.claude.com/docs/en/zero-data-retention.md — Zero data retention
-- [ ] https://code.claude.com/docs/en/devcontainer.md — Development containers
+- [ ] https://code.claude.com/docs/en/analytics — Track team usage with analytics
+- [ ] https://code.claude.com/docs/en/monitoring-usage — Monitoring
+- [ ] https://code.claude.com/docs/en/costs — Manage costs effectively
+- [ ] https://code.claude.com/docs/en/security — Security
+- [ ] https://code.claude.com/docs/en/legal-and-compliance — Legal and compliance
+- [ ] https://code.claude.com/docs/en/zero-data-retention — Zero data retention
+- [ ] https://code.claude.com/docs/en/devcontainer — Development containers
 
 #### エンタープライズ配備
 
-- [ ] https://code.claude.com/docs/en/third-party-integrations.md — Enterprise deployment overview
-- [ ] https://code.claude.com/docs/en/amazon-bedrock.md — Claude Code on Amazon Bedrock
-- [ ] https://code.claude.com/docs/en/google-vertex-ai.md — Claude Code on Google Vertex AI
-- [ ] https://code.claude.com/docs/en/microsoft-foundry.md — Claude Code on Microsoft Foundry
-- [ ] https://code.claude.com/docs/en/llm-gateway.md — LLM gateway configuration
-- [ ] https://code.claude.com/docs/en/network-config.md — Enterprise network configuration
+- [ ] https://code.claude.com/docs/en/third-party-integrations — Enterprise deployment overview
+- [ ] https://code.claude.com/docs/en/amazon-bedrock — Claude Code on Amazon Bedrock
+- [ ] https://code.claude.com/docs/en/google-vertex-ai — Claude Code on Google Vertex AI
+- [ ] https://code.claude.com/docs/en/microsoft-foundry — Claude Code on Microsoft Foundry
+- [ ] https://code.claude.com/docs/en/llm-gateway — LLM gateway configuration
+- [ ] https://code.claude.com/docs/en/network-config — Enterprise network configuration
 
 ---
 
@@ -278,56 +278,56 @@ MCP で外部システムと連携し、Agent SDK で完全に独立したカス
 
 #### MCP
 
-- [ ] https://code.claude.com/docs/en/mcp.md — Connect Claude Code to tools via MCP
+- [ ] https://code.claude.com/docs/en/mcp — Connect Claude Code to tools via MCP
 
 #### クラウド高度機能
 
-- [ ] https://code.claude.com/docs/en/ultraplan.md — Plan in the cloud with ultraplan
-- [ ] https://code.claude.com/docs/en/ultrareview.md — Find bugs with ultrareview
+- [ ] https://code.claude.com/docs/en/ultraplan — Plan in the cloud with ultraplan
+- [ ] https://code.claude.com/docs/en/ultrareview — Find bugs with ultrareview
 
 #### Agent SDK — 概要・導入
 
-- [ ] https://code.claude.com/docs/en/agent-sdk/overview.md — Agent SDK overview
-- [ ] https://code.claude.com/docs/en/agent-sdk/quickstart.md — Quickstart
-- [ ] https://code.claude.com/docs/en/agent-sdk/migration-guide.md — Migrate to Claude Agent SDK
-- [ ] https://code.claude.com/docs/en/agent-sdk/agent-loop.md — How the agent loop works
-- [ ] https://code.claude.com/docs/en/agent-sdk/claude-code-features.md — Use Claude Code features in the SDK
+- [ ] https://code.claude.com/docs/en/agent-sdk/overview — Agent SDK overview
+- [ ] https://code.claude.com/docs/en/agent-sdk/quickstart — Quickstart
+- [ ] https://code.claude.com/docs/en/agent-sdk/migration-guide — Migrate to Claude Agent SDK
+- [ ] https://code.claude.com/docs/en/agent-sdk/agent-loop — How the agent loop works
+- [ ] https://code.claude.com/docs/en/agent-sdk/claude-code-features — Use Claude Code features in the SDK
 
 #### Agent SDK — リファレンス
 
-- [ ] https://code.claude.com/docs/en/agent-sdk/python.md — Agent SDK reference - Python
-- [ ] https://code.claude.com/docs/en/agent-sdk/typescript.md — Agent SDK reference - TypeScript
-- [ ] https://code.claude.com/docs/en/agent-sdk/typescript-v2-preview.md — TypeScript SDK V2 interface (preview)
+- [ ] https://code.claude.com/docs/en/agent-sdk/python — Agent SDK reference - Python
+- [ ] https://code.claude.com/docs/en/agent-sdk/typescript — Agent SDK reference - TypeScript
+- [ ] https://code.claude.com/docs/en/agent-sdk/typescript-v2-preview — TypeScript SDK V2 interface (preview)
 
 #### Agent SDK — ツール・拡張
 
-- [ ] https://code.claude.com/docs/en/agent-sdk/custom-tools.md — Give Claude custom tools
-- [ ] https://code.claude.com/docs/en/agent-sdk/tool-search.md — Scale to many tools with tool search
-- [ ] https://code.claude.com/docs/en/agent-sdk/mcp.md — Connect to external tools with MCP
-- [ ] https://code.claude.com/docs/en/agent-sdk/plugins.md — Plugins in the SDK
-- [ ] https://code.claude.com/docs/en/agent-sdk/skills.md — Agent Skills in the SDK
-- [ ] https://code.claude.com/docs/en/agent-sdk/slash-commands.md — Slash Commands in the SDK
-- [ ] https://code.claude.com/docs/en/agent-sdk/subagents.md — Subagents in the SDK
-- [ ] https://code.claude.com/docs/en/agent-sdk/hooks.md — Intercept and control agent behavior with hooks
+- [ ] https://code.claude.com/docs/en/agent-sdk/custom-tools — Give Claude custom tools
+- [ ] https://code.claude.com/docs/en/agent-sdk/tool-search — Scale to many tools with tool search
+- [ ] https://code.claude.com/docs/en/agent-sdk/mcp — Connect to external tools with MCP
+- [ ] https://code.claude.com/docs/en/agent-sdk/plugins — Plugins in the SDK
+- [ ] https://code.claude.com/docs/en/agent-sdk/skills — Agent Skills in the SDK
+- [ ] https://code.claude.com/docs/en/agent-sdk/slash-commands — Slash Commands in the SDK
+- [ ] https://code.claude.com/docs/en/agent-sdk/subagents — Subagents in the SDK
+- [ ] https://code.claude.com/docs/en/agent-sdk/hooks — Intercept and control agent behavior with hooks
 
 #### Agent SDK — 実行制御
 
-- [ ] https://code.claude.com/docs/en/agent-sdk/sessions.md — Work with sessions
-- [ ] https://code.claude.com/docs/en/agent-sdk/streaming-output.md — Stream responses in real-time
-- [ ] https://code.claude.com/docs/en/agent-sdk/streaming-vs-single-mode.md — Streaming Input
-- [ ] https://code.claude.com/docs/en/agent-sdk/structured-outputs.md — Get structured output from agents
-- [ ] https://code.claude.com/docs/en/agent-sdk/todo-tracking.md — Todo Lists
-- [ ] https://code.claude.com/docs/en/agent-sdk/user-input.md — Handle approvals and user input
-- [ ] https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts.md — Modifying system prompts
-- [ ] https://code.claude.com/docs/en/agent-sdk/file-checkpointing.md — Rewind file changes with checkpointing
-- [ ] https://code.claude.com/docs/en/agent-sdk/permissions.md — Configure permissions
+- [ ] https://code.claude.com/docs/en/agent-sdk/sessions — Work with sessions
+- [ ] https://code.claude.com/docs/en/agent-sdk/streaming-output — Stream responses in real-time
+- [ ] https://code.claude.com/docs/en/agent-sdk/streaming-vs-single-mode — Streaming Input
+- [ ] https://code.claude.com/docs/en/agent-sdk/structured-outputs — Get structured output from agents
+- [ ] https://code.claude.com/docs/en/agent-sdk/todo-tracking — Todo Lists
+- [ ] https://code.claude.com/docs/en/agent-sdk/user-input — Handle approvals and user input
+- [ ] https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts — Modifying system prompts
+- [ ] https://code.claude.com/docs/en/agent-sdk/file-checkpointing — Rewind file changes with checkpointing
+- [ ] https://code.claude.com/docs/en/agent-sdk/permissions — Configure permissions
 
 #### Agent SDK — 運用
 
-- [ ] https://code.claude.com/docs/en/agent-sdk/hosting.md — Hosting the Agent SDK
-- [ ] https://code.claude.com/docs/en/agent-sdk/secure-deployment.md — Securely deploying AI agents
-- [ ] https://code.claude.com/docs/en/agent-sdk/observability.md — Observability with OpenTelemetry
-- [ ] https://code.claude.com/docs/en/agent-sdk/cost-tracking.md — Track cost and usage
+- [ ] https://code.claude.com/docs/en/agent-sdk/hosting — Hosting the Agent SDK
+- [ ] https://code.claude.com/docs/en/agent-sdk/secure-deployment — Securely deploying AI agents
+- [ ] https://code.claude.com/docs/en/agent-sdk/observability — Observability with OpenTelemetry
+- [ ] https://code.claude.com/docs/en/agent-sdk/cost-tracking — Track cost and usage
 
 ---
 

@@ -2,10 +2,10 @@
 
 ## 今回読んだ docs
 
-- [overview.md](https://code.claude.com/docs/en/overview.md) — Claude Code の全体像
-- [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works.md) — agentic loop、ツール、セッション、権限
-- [quickstart.md](https://code.claude.com/docs/en/quickstart.md) — 初回セットアップから最初のコード変更まで
-- [best-practices.md](https://code.claude.com/docs/en/best-practices.md) — 効果的に使うためのパターン集
+- [overview.md](https://code.claude.com/docs/en/overview) — Claude Code の全体像
+- [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works) — agentic loop、ツール、セッション、権限
+- [quickstart.md](https://code.claude.com/docs/en/quickstart) — 初回セットアップから最初のコード変更まで
+- [best-practices.md](https://code.claude.com/docs/en/best-practices) — 効果的に使うためのパターン集
 
 ## トピック別ノート
 

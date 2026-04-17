@@ -1,6 +1,6 @@
 # 02. セッション・コンテキスト管理・checkpoint
 
-出典: [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works.md), [best-practices.md](https://code.claude.com/docs/en/best-practices.md)
+出典: [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works), [best-practices.md](https://code.claude.com/docs/en/best-practices)
 
 ## セッション = ディレクトリに紐付く会話ログ
 

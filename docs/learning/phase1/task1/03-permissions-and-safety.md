@@ -1,6 +1,6 @@
 # 03. Permission modes と安全機構
 
-出典: [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works.md), [best-practices.md](https://code.claude.com/docs/en/best-practices.md)
+出典: [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works), [best-practices.md](https://code.claude.com/docs/en/best-practices)
 
 ## 4 つの permission mode
 

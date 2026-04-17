@@ -1,6 +1,6 @@
 # 04. 効果的なプロンプトと CLAUDE.md の書き方
 
-出典: [best-practices.md](https://code.claude.com/docs/en/best-practices.md), [quickstart.md](https://code.claude.com/docs/en/quickstart.md)
+出典: [best-practices.md](https://code.claude.com/docs/en/best-practices), [quickstart.md](https://code.claude.com/docs/en/quickstart)
 
 ## 黄金ルール: context を管理せよ
 

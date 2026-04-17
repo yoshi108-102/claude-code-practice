@@ -1,6 +1,6 @@
 # 01. agentic loop と 5 つの tool カテゴリ
 
-出典: [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works.md)
+出典: [how-claude-code-works.md](https://code.claude.com/docs/en/how-claude-code-works)
 
 ## agentic loop の 3 フェーズ
 
