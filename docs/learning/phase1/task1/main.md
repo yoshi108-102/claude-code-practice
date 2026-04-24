@@ -13,6 +13,7 @@
 - [02-sessions-and-context.md](./02-sessions-and-context.md) — セッション・コンテキスト管理・checkpoint
 - [03-permissions-and-safety.md](./03-permissions-and-safety.md) — 4 つの permission mode と安全機構
 - [04-best-practices-essentials.md](./04-best-practices-essentials.md) — 効果的なプロンプトと CLAUDE.md の書き方
+- [05-auto-mode-deep-dive.md](./05-auto-mode-deep-dive.md) — Auto モード深掘り（classifier の挙動 + 復習キュー Q6 の補足）
 
 ## リファレンス（深掘り / 脱線トピック）
 

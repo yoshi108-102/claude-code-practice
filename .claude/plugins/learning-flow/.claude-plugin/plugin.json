@@ -1,0 +1,11 @@
+{
+  "name": "learning-flow",
+  "version": "0.1.0",
+  "description": "段階的な学習プロジェクト（Phase/Task構成）の進行を支援するプラグイン。勝手に進めず、解説→確認→実装→振り返りのサイクルを守りながら学習ノート(Q&A・リファレンス)を自動で整理する。",
+  "author": {
+    "name": "yoshi108-102",
+    "email": "ginyoku102@gmail.com"
+  },
+  "keywords": ["learning", "study", "phase", "japanese", "docs"],
+  "license": "MIT"
+}
