@@ -201,3 +201,125 @@ MCP サーバーが prompt を公開していると `/mcp__<server>__<prompt>` �
 ---
 
 _Auto-generated at 2026-05-08 via /learning-flow:material（公式docs駆動）_
+
+## 振り返りクイズ
+
+回答は各問の `**回答**:` 行の下に記入してください。
+全問記入後に `/learning-flow:grade` を実行すると、Claude が採点して進捗を更新します。
+
+範囲: 02-slash-commands.md / reference (subagent-model-override, customizing-bundled-skills, plan-mode-vs-plan-subagent, claude-agents-cli-and-sources, worktree-usage-and-tradeoffs)
+
+---
+
+### Q1. 組み込みコマンドとバンドルスキルの本質的な違い
+
+`/help` の出力には `[Skill]` マーク付きのコマンドと無いものが混在している。これら 2 種類は **「実装位置」と「実行の確実性」の観点でどう違う**か。説明したうえで、**`/clear` を `/init` で代用しようとすると何が問題になる**か（あるいはその逆も）の例を挙げよ。
+
+実装位置というか、実装レイヤーとしては、AIを通さないのが/clearのような組み込みコマンドで、AIに指示してやらせるのが/initのようなバンドルスキル。
+AIは不確実性があるのでstaticにコンテキストが常に消去されるとは限らないし、逆をやると自由度が不足する（clearとinitはそもそもやることが少し違うので代用について記載するのは少し難しいが...）
+
+**参考**:
+- [Commands](https://code.claude.com/docs/en/commands)
+- [Skills - Bundled skills](https://code.claude.com/docs/en/skills#bundled-skills)
+
+**関連ノート**: [02-slash-commands.md](02-slash-commands.md)
+
+**回答**:
+
+---
+
+### Q2. `/clear` と `/compact` の使い分け
+
+`/clear` と `/compact` は両方とも「コンテキストを軽くする」コマンドだが、性質が大きく異なる。**それぞれ何をするか**、**どんな場面で使うべきか**、そして **「タスク切替時に `/compact` を使うのは何が問題か」** を説明せよ。
+
+/clearは組み込みコマンドとして、セッションにおけるコンテキストをまっさらにする一方、/compactは要約して軽くする。前者は明らかにハルシネーションがひどくなる（2回やってもバグが治らないなど）か、話を変える時。後者は同じタスクを続けたいが会話が深くなった時に使用する。そのため、タスク切り替え時に/compactを使うと無駄なコンテキストによりAIが混乱するのでやめた方がいい
+
+**参考**:
+- [Commands - /clear and /compact](https://code.claude.com/docs/en/commands)
+
+**関連ノート**: [02-slash-commands.md](02-slash-commands.md) (セッション管理セクション)
+
+**回答**:
+
+---
+
+### Q3. 引数表記のルール
+
+公式 docs のコマンド表で、コマンドの引数は `<arg>` または `[arg]` の 2 種類で表記される。**それぞれの意味は何か**。また、ユーザーが実際に `/agents <command>` と打ったときに**何が起こるか**（コマンドとして正しく動くか、何か文字列として渡されるか）を説明せよ。
+<arg>は必須引数で[arg]はオプション引数。
+
+**参考**:
+- [Commands - argument notation](https://code.claude.com/docs/en/commands)
+
+**回答**:
+
+---
+
+### Q4. `/context` で何が分かるか / 何のために使うか
+
+`/context` を実行すると **「カテゴリ別のトークン使用量」** が表示される。表示される代表的な 5 カテゴリ（System prompt / System tools / Memory files / Skills / Messages 等）のうち、**ユーザーが「軽くしたい」と思ったときに介入できる**のはどれで、どのコマンドで対処するか。逆に**介入できない**カテゴリは何で、それはなぜか。
+
+**参考**:
+- [Commands - /context](https://code.claude.com/docs/en/commands)
+- [How Claude Code Works - context window](https://code.claude.com/docs/en/how-claude-code-works)
+
+**関連ノート**: [02-slash-commands.md](02-slash-commands.md)
+
+**回答**:
+
+---
+
+### Q5. subagent を別モデルで動かす方法と優先順位
+
+親セッションを Opus 4.7 のまま、subagent だけ Sonnet で動かしたい。**3 つの設定レイヤー**があり、それぞれの優先順位がある。**3 つを優先順位順に挙げ**、**「親セッションが Opus でも subagent が必ず Opus で動いてしまう設定」** はどれか説明せよ。
+
+**参考**:
+- [Subagents](https://code.claude.com/docs/en/sub-agents)
+
+**関連ノート**: [reference/subagent-model-override.md](reference/subagent-model-override.md)
+
+**回答**:
+
+---
+
+### Q6. bundled skill のカスタマイズ — 「コーディング規約」を実装する 4 つの道
+
+チームで `/review` 相当の独自レビュールールを実装したい場合、**4 つのカスタマイズ手段（A: CLAUDE.md / B: 別名 skill / C: 同名上書き / D: plugin）** がある。それぞれの**メリット・デメリット**を整理し、**チームで本格運用するときに最も推奨される**のはどれで、なぜか。**同名上書き (C) が推奨されない理由**も併せて説明せよ。
+
+**参考**:
+- [Skills - Where skills live](https://code.claude.com/docs/en/skills)
+- [Skills - precedence](https://code.claude.com/docs/en/skills)
+
+**関連ノート**: [reference/customizing-bundled-skills.md](reference/customizing-bundled-skills.md)
+
+**回答**:
+
+---
+
+### Q7. `/permissions` の 3 階層とルール衝突
+
+`/permissions` のルールは 3 つのスコープに分かれて保存される（**user global / project shared / project local**）。**それぞれの保存先ファイルパス**を答え、**同じツールに対して `allow` ルールと `deny` ルールが両方ある場合、どちらが勝つか**、また**その設計理由（なぜそうなっているのが望ましいか）**を説明せよ。
+
+**参考**:
+- [Permissions](https://code.claude.com/docs/en/permissions)
+- [Settings](https://code.claude.com/docs/en/settings)
+
+**関連ノート**: [02-slash-commands.md](02-slash-commands.md) (権限カテゴリ)
+
+**回答**:
+
+---
+
+### Q8. `/undo` の限界 — Bash 副作用と git の役割分担
+
+`/undo` は「Claude が直前のターンで行った編集を取り消す」コマンドだが、**取り消せるもの / 取り消せないもの** がはっきり分かれている。**取り消せない代表例を 2 つ**挙げ、**それぞれをロールバックしたい場合に何を使うべきか**（git / 手動 / 諦める など）を説明せよ。さらに、**「3 ターン前の編集を取り消したい」場合に `/undo` を 3 回連打してはいけない理由**も答えよ。
+
+**参考**:
+- [Commands - /undo / /rewind](https://code.claude.com/docs/en/commands)
+- [How Claude Code Works - checkpoints](https://code.claude.com/docs/en/how-claude-code-works)
+
+**関連ノート**: [02-slash-commands.md](02-slash-commands.md) (編集レビュー)
+
+**回答**:
+
+---

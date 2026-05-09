@@ -161,7 +161,10 @@ claude --append-system-prompt "Always respond in Japanese. Use TypeScript for ex
 
 ## 関連
 
-- 議論・Q&A: （`lesson` 中に発生したら `reference/` 配下にリンクが追加されます）
+- 議論・Q&A:
+  - [reference/claude-agents-cli-and-sources.md](reference/claude-agents-cli-and-sources.md) — `claude agents` CLI と subagent の source 階層
+  - [reference/plan-mode-vs-plan-subagent.md](reference/plan-mode-vs-plan-subagent.md) — plan mode と Plan subagent の区別
+  - [reference/worktree-usage-and-tradeoffs.md](reference/worktree-usage-and-tradeoffs.md) — worktree の必須条件 / merge / branch 切替との比較
 - 次の教材: [02-slash-commands.md](02-slash-commands.md) — セッション内のスラッシュコマンド
 - 関連 docs: [Settings](https://code.claude.com/docs/en/settings) / [Permission modes](https://code.claude.com/docs/en/permission-modes) / [Headless mode](https://code.claude.com/docs/en/headless)
 
