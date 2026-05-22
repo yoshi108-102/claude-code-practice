@@ -246,7 +246,7 @@ AIは不確実性があるのでstaticにコンテキストが常に消去され
 ### Q3. 引数表記のルール
 
 公式 docs のコマンド表で、コマンドの引数は `<arg>` または `[arg]` の 2 種類で表記される。**それぞれの意味は何か**。また、ユーザーが実際に `/agents <command>` と打ったときに**何が起こるか**（コマンドとして正しく動くか、何か文字列として渡されるか）を説明せよ。
-<arg>は必須引数で[arg]はオプション引数。
+<arg>は必須引数で[arg]はオプション引数。　/agents
 
 **参考**:
 - [Commands - argument notation](https://code.claude.com/docs/en/commands)
