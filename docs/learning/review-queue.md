@@ -147,11 +147,13 @@
 
 ---
 
-### [2026-05-22] Phase 1 / Task 2（まとめ）— Q5 subagent モデルの優先順位とコストの罠
+### [2026-06-12] Phase 1 / Task 2（まとめ）— Q5 subagent モデルの優先順位とコストの罠
 
 **問題**: subagent のモデルを決める 3 レイヤーを優先順位順に。意図しない高コストの最大原因。`model:opus` 固定が `/model` に従わない理由を subagent の本質と絡めて。
 
 **当時の回答 (2026-05-22)**: 「覚えていない」。
+
+**2026-06-12 再出題時**: 「わからない」。本セッションで [reference/subagent-model-override.md](../phase1/task2/reference/subagent-model-override.md) を 30 分前に深掘りした直後だったが定着せず。記憶への定着段階に課題あり（理解 → 言語化のリハーサル不足）。
 
 **模範解答の要点**:
 - 優先順位: ①呼び出し時の `model` 引数 → ②agent 定義 frontmatter の `model` → ③親モデル継承
@@ -165,11 +167,13 @@
 
 ---
 
-### [2026-05-22] Phase 1 / Task 2（まとめ）— Q6 bundled skill カスタマイズ4経路
+### [2026-06-12] Phase 1 / Task 2（まとめ）— Q6 bundled skill カスタマイズ4経路
 
 **問題**: (B) 別名 skill が最も健全な理由を context 効率で (A) CLAUDE.md と対比。(C) 同名上書きが非推奨な理由を 2 つ。
 
 **当時の回答 (2026-05-22)**: 「わからん」。
+
+**2026-06-12 再出題時**: 「わからない」。本セッションで [reference/customizing-bundled-skills.md](../phase1/task2/reference/customizing-bundled-skills.md) を深掘りした直後だったが定着せず。Q5 と同様、理解 → 言語化のリハーサル不足。
 
 **模範解答の要点**:
 - (B) が健全な理由: CLAUDE.md(A) は**常時 context に乗る**ので詳細ルールで圧迫。別名 skill(B) は**invoke 時のみ load**で context 効率良 + bundled を壊さない

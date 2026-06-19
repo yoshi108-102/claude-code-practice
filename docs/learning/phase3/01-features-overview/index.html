@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code の拡張機能 — 全体像 — Phase 3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #fafafa;
+    }
+
+    .site-header {
+      border-bottom: 1px solid #e8e8e8;
+      padding: 12px 0;
+      background: #fff;
+    }
+    .site-header-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+      font-size: 13px;
+      color: #666;
+    }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      background: #fff;
+      min-height: 100vh;
+    }
+
+    .source-note {
+      border-left: 3px solid #3d7fc1;
+      background: #f0f5fb;
+      padding: 10px 16px;
+      border-radius: 0 4px 4px 0;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 32px;
+    }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    .source-note a:hover { text-decoration: underline; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 20px;
+      line-height: 1.35;
+      border-bottom: 2px solid #3d7fc1;
+      padding-bottom: 12px;
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 40px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #ddd;
+    }
+    h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 28px 0 10px;
+    }
+
+    p { margin-bottom: 14px; }
+
+    strong { font-weight: 700; }
+
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th {
+      background: #f0f4f8;
+      color: #333;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid #dde3ea;
+    }
+    td {
+      padding: 8px 12px;
+      border: 1px solid #dde3ea;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #fafbfc; }
+
+    pre {
+      background: #f4f4f4;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    code {
+      font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace;
+    }
+    p code, li code, td code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 13px;
+    }
+
+    .footer-nav {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #e8e8e8;
+      font-size: 13px;
+      color: #666;
+    }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .footer-nav a:hover { text-decoration: underline; }
+
+    .auto-generated {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #aaa;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    ← <a href="../index.html">Phase 3 トップ</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>Claude Code の拡張機能 — 全体像</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/features-overview" target="_blank">Extend Claude Code</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「features-overview」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>Claude Code にはファイル操作・検索・実行・Web アクセスの組み込みツールが備わっており、ほとんどのコーディングタスクをカバーする。その上に重ねる「拡張レイヤー」がこのページのテーマ: Claude が知ること・外部サービスとの連携・ワークフローの自動化をカスタマイズする機能群。新規ユーザーは CLAUDE.md から始め、具体的なトリガーが生じたら他の機能を追加していくのが推奨パス。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>拡張機能の一覧</h3>
+  <p>各機能はエージェントループの異なる部分に差し込まれる:</p>
+
+  <table>
+    <thead>
+      <tr><th>機能</th><th>役割</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>CLAUDE.md</strong></td><td>毎セッション Claude が参照する永続コンテキスト</td></tr>
+      <tr><td><strong>Skills</strong></td><td>再利用可能なナレッジと呼び出し可能なワークフロー</td></tr>
+      <tr><td><strong>Code intelligence</strong></td><td>LSP 経由でシンボルナビゲーション・型エラーをリアルタイム提供</td></tr>
+      <tr><td><strong>MCP</strong></td><td>外部サービス・ツールと Claude を接続</td></tr>
+      <tr><td><strong>Subagents</strong></td><td>独立したコンテキストで処理し、サマリーだけを返す</td></tr>
+      <tr><td><strong>Agent teams</strong></td><td>共有タスクリストとメッセージングで複数セッションを協調</td></tr>
+      <tr><td><strong>Hooks</strong></td><td>ライフサイクルイベントでスクリプト / HTTP / プロンプト / サブエージェントを起動</td></tr>
+      <tr><td><strong>Plugins / Marketplaces</strong></td><td>上記機能をパッケージ化して配布</td></tr>
+    </tbody>
+  </table>
+
+  <p>Skills が最も柔軟な拡張。<code>/deploy</code> のようにコマンドとして呼び出すか、Claude が自動的に関連 Skill を読み込む。Skill は現在の会話で実行するほか、サブエージェント（<code>context: fork</code>）経由で隔離実行も可能。</p>
+
+  <h3>機能の選び方</h3>
+
+  <table>
+    <thead>
+      <tr><th>トリガー</th><th>追加すべき機能</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Claude が規約を 2 回間違えた</td><td>CLAUDE.md に追記</td></tr>
+      <tr><td>同じプロンプトを毎回貼っている</td><td>Skill として保存</td></tr>
+      <tr><td>同じ手順書を 3 回以上コピペした</td><td>Skill として整備</td></tr>
+      <tr><td>ブラウザのデータを毎回コピーしている</td><td>MCP サーバーで接続</td></tr>
+      <tr><td>シンボル探索で多くのファイルを読んでいる</td><td>Code intelligence プラグインを導入</td></tr>
+      <tr><td>サイドタスクの出力が会話を埋めてしまう</td><td>Subagent に回す</td></tr>
+      <tr><td>毎回必ず実行したいことがある</td><td>Hook を書く</td></tr>
+      <tr><td>別リポジトリで同じ設定が必要</td><td>Plugin にまとめる</td></tr>
+    </tbody>
+  </table>
+
+  <h3>似た機能の比較</h3>
+
+  <h4>Skill vs Subagent</h4>
+  <table>
+    <thead><tr><th></th><th>Skill</th><th>Subagent</th></tr></thead>
+    <tbody>
+      <tr><td><strong>正体</strong></td><td>再利用可能な指示・ナレッジ</td><td>独自コンテキストで動く独立ワーカー</td></tr>
+      <tr><td><strong>主な利点</strong></td><td>複数コンテキストでコンテンツ共有</td><td>コンテキスト隔離。中間処理は見えない</td></tr>
+      <tr><td><strong>コンテキスト影響</strong></td><td>メインウィンドウに追加</td><td>独立したウィンドウを使う</td></tr>
+      <tr><td><strong>向いている用途</strong></td><td>リファレンス素材・呼び出し型ワークフロー</td><td>多数ファイルを読む・並列作業・専門ワーカー</td></tr>
+    </tbody>
+  </table>
+
+  <h4>CLAUDE.md vs Skill</h4>
+  <table>
+    <thead><tr><th></th><th>CLAUDE.md</th><th>Skill</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ロード</strong></td><td>毎セッション自動</td><td>オンデマンド</td></tr>
+      <tr><td><strong>ワークフロー起動</strong></td><td>不可</td><td><code>/名前</code> で可能</td></tr>
+      <tr><td><strong>向いている用途</strong></td><td>"常に X をする" ルール</td><td>リファレンス資料・呼び出し型ワークフロー</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Subagent vs Agent team</h4>
+  <table>
+    <thead><tr><th></th><th>Subagent</th><th>Agent team</th></tr></thead>
+    <tbody>
+      <tr><td><strong>通信</strong></td><td>親エージェントにのみ結果を返す</td><td>チームメイト同士が直接メッセージ</td></tr>
+      <tr><td><strong>協調</strong></td><td>親が全ての仕事を管理</td><td>共有タスクリストで自律調整</td></tr>
+      <tr><td><strong>トークンコスト</strong></td><td>低（サマリーとして返す）</td><td>高（各メンバーが独立した Claude インスタンス）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Hook vs Skill</h4>
+  <table>
+    <thead><tr><th></th><th>Hook</th><th>Skill</th></tr></thead>
+    <tbody>
+      <tr><td><strong>起動</strong></td><td>ライフサイクルイベントで確実に実行</td><td>Claude の判断 or <code>/名前</code> で実行</td></tr>
+      <tr><td><strong>使いどころ</strong></td><td>毎回同じように動かしたいルール実施</td><td>推論が必要なワークフロー・リファレンス素材</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>ポイント</strong>: "<code>.env</code> を絶対に編集しない" という命令を CLAUDE.md や Skill に書いても「お願い」に過ぎない。<code>PreToolUse</code> Hook でブロックすれば「強制」になる。</p>
+
+  <h3>機能がレイヤーする仕組み</h3>
+  <ul>
+    <li><strong>CLAUDE.md</strong>: 全スコープの内容が同時に追加（上書きでなく合算）</li>
+    <li><strong>Skills / Subagents</strong>: 同名が複数スコープにある場合、優先度順に 1 つが勝つ（managed &gt; user &gt; project）</li>
+    <li><strong>MCP servers</strong>: local &gt; project &gt; user</li>
+    <li><strong>Hooks</strong>: 全スコープのフックが該当イベントで発火（マージ）</li>
+  </ul>
+
+  <h3>コンテキストコストの考え方</h3>
+  <table>
+    <thead><tr><th>機能</th><th>いつロード</th><th>コスト</th></tr></thead>
+    <tbody>
+      <tr><td>CLAUDE.md</td><td>セッション開始</td><td>毎リクエスト</td></tr>
+      <tr><td>Skills</td><td>セッション開始（説明のみ）＋使用時（本文）</td><td>低</td></tr>
+      <tr><td>MCP servers</td><td>セッション開始（ツール名のみ）</td><td>低</td></tr>
+      <tr><td>Code intelligence</td><td>ファイル編集後・オンデマンド</td><td>低</td></tr>
+      <tr><td>Subagents</td><td>スポーン時（独立コンテキスト）</td><td>メインセッションと隔離</td></tr>
+      <tr><td>Hooks</td><td>トリガー時（外部実行）</td><td>ゼロ（出力を返す場合は追加）</td></tr>
+    </tbody>
+  </table>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>全機能を最初から設定する必要はない。<strong>具体的なトリガーが生じたら追加</strong>していく</li>
+    <li>Skills は最も柔軟。リファレンス型・アクション型の両方をカバーする</li>
+    <li>ルールの「強制力」が必要なら CLAUDE.md ではなく Hook を使う</li>
+    <li>Subagents はコンテキスト隔離が主な目的。Agent teams はチームメイト同士の協調が必要なときに使う</li>
+    <li>Plugin は複数プロジェクトや他者への配布に使うパッケージレイヤー</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>機能の組み合わせパターン</h3>
+  <table>
+    <thead><tr><th>パターン</th><th>仕組み</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Skill + MCP</strong></td><td>MCP で接続、Skill でその使い方を教える</td></tr>
+      <tr><td><strong>Skill + Subagent</strong></td><td>Skill がサブエージェントを並列実行</td></tr>
+      <tr><td><strong>CLAUDE.md + Skills</strong></td><td>常時ルールは CLAUDE.md、詳細は Skill にオフロード</td></tr>
+      <tr><td><strong>Hook + MCP</strong></td><td>Hook が MCP 経由で外部アクションをトリガー</td></tr>
+    </tbody>
+  </table>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../02-skills-deep-dive/index.html">02-skills-deep-dive/</a> — Skills の詳細設定と高度なパターン</li>
+  </ul>
+
+  <div class="footer-nav">
+    ← <a href="../main.md">Phase 3 Markdown 目次（main.md）</a>
+  </div>
+
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

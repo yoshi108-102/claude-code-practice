@@ -1,3 +1,4 @@
+<!-- DEPRECATED: 新版は ../06-permission-modes/index.md（HTML 版は index.html）-->
 # 03. Permission モード — 6つの動作モード
 
 > 出典: [Choose a permission mode](https://code.claude.com/docs/en/permission-modes)（閲覧日 2026-05-22）

@@ -1,3 +1,4 @@
+<!-- DEPRECATED: 新版は ../04-settings-files-and-precedence/index.md〜../07-env-vars-and-model-config/index.md（HTML 版は各 index.html）-->
 # Phase 2 / Task 2: 設定・権限
 
 ## 今回読む docs

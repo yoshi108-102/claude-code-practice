@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hooks 基礎 — Phase 3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">← <a href="../index.html">Phase 3 トップ</a></div>
+</header>
+<div class="container">
+
+  <h1>Hooks 基礎 — ライフサイクルイベントと設定</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/hooks-guide" target="_blank">Automate actions with hooks</a> および <a href="https://code.claude.com/docs/en/hooks" target="_blank">Hooks reference</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの hooks-guide（前半）と hooks リファレンスの概念・設定部分を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>Hooks は Claude Code のライフサイクルの特定ポイントで実行されるユーザー定義のシェルコマンド。LLM に「実行してほしい」と頼むのではなく、<strong>決定論的に確実に実行される</strong>制御を提供する。ファイル編集後の自動フォーマット、コマンド実行前の検証、セッション開始時のコンテキスト注入、通知送信などに使用する。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>全 Hook イベント一覧</h3>
+  <table>
+    <thead><tr><th>イベント</th><th>発火タイミング</th></tr></thead>
+    <tbody>
+      <tr><td><code>SessionStart</code></td><td>セッション開始・再開時</td></tr>
+      <tr><td><code>Setup</code></td><td><code>--init-only</code> / <code>--init</code> / <code>--maintenance</code> で起動時（CI向け）</td></tr>
+      <tr><td><code>UserPromptSubmit</code></td><td>プロンプト送信時（Claude が処理する前）</td></tr>
+      <tr><td><code>UserPromptExpansion</code></td><td>ユーザーコマンドがプロンプトに展開される時</td></tr>
+      <tr><td><code>PreToolUse</code></td><td>ツール呼び出し実行前（ブロック可）</td></tr>
+      <tr><td><code>PermissionRequest</code></td><td>パーミッションダイアログが表示される時</td></tr>
+      <tr><td><code>PermissionDenied</code></td><td>auto モード分類器がツール呼び出しを拒否した時</td></tr>
+      <tr><td><code>PostToolUse</code></td><td>ツール呼び出し成功後</td></tr>
+      <tr><td><code>PostToolUseFailure</code></td><td>ツール呼び出し失敗後</td></tr>
+      <tr><td><code>PostToolBatch</code></td><td>並列ツール呼び出しのバッチ完了後</td></tr>
+      <tr><td><code>Notification</code></td><td>Claude Code が通知を送る時</td></tr>
+      <tr><td><code>MessageDisplay</code></td><td>アシスタントのメッセージテキスト表示中</td></tr>
+      <tr><td><code>SubagentStart</code></td><td>サブエージェントがスポーンされた時</td></tr>
+      <tr><td><code>SubagentStop</code></td><td>サブエージェントが終了した時</td></tr>
+      <tr><td><code>TaskCreated</code></td><td><code>TaskCreate</code> でタスクが作成される時</td></tr>
+      <tr><td><code>TaskCompleted</code></td><td>タスクが完了としてマークされる時</td></tr>
+      <tr><td><code>Stop</code></td><td>Claude が応答を終えた時</td></tr>
+      <tr><td><code>StopFailure</code></td><td>API エラーでターンが終了した時</td></tr>
+      <tr><td><code>TeammateIdle</code></td><td>Agent team のチームメイトがアイドル状態になる時</td></tr>
+      <tr><td><code>InstructionsLoaded</code></td><td>CLAUDE.md / rules が読み込まれた時</td></tr>
+      <tr><td><code>ConfigChange</code></td><td>セッション中に設定ファイルが変更された時</td></tr>
+      <tr><td><code>CwdChanged</code></td><td>作業ディレクトリが変わった時</td></tr>
+      <tr><td><code>FileChanged</code></td><td>監視ファイルがディスク上で変更された時</td></tr>
+      <tr><td><code>WorktreeCreate</code></td><td>Worktree が作成される時</td></tr>
+      <tr><td><code>WorktreeRemove</code></td><td>Worktree が削除される時</td></tr>
+      <tr><td><code>PreCompact</code></td><td>コンテキストコンパクション前</td></tr>
+      <tr><td><code>PostCompact</code></td><td>コンテキストコンパクション完了後</td></tr>
+      <tr><td><code>Elicitation</code></td><td>MCP サーバーがユーザー入力を要求した時</td></tr>
+      <tr><td><code>ElicitationResult</code></td><td>ユーザーが MCP elicitation に応答した後</td></tr>
+      <tr><td><code>SessionEnd</code></td><td>セッション終了時</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Hook タイプ</h3>
+  <table>
+    <thead><tr><th>タイプ</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td><code>"type": "command"</code></td><td>シェルコマンドを実行（最も一般的）</td></tr>
+      <tr><td><code>"type": "http"</code></td><td>URL に POST</td></tr>
+      <tr><td><code>"type": "mcp_tool"</code></td><td>接続済み MCP サーバーのツールを呼び出す</td></tr>
+      <tr><td><code>"type": "prompt"</code></td><td>単一ターンの LLM 評価（判断が必要な場合）</td></tr>
+      <tr><td><code>"type": "agent"</code></td><td>ツールアクセスを持つマルチターン検証（実験的）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>設定場所（スコープ）</h3>
+  <table>
+    <thead><tr><th>場所</th><th>スコープ</th><th>共有可</th></tr></thead>
+    <tbody>
+      <tr><td><code>~/.claude/settings.json</code></td><td>全プロジェクト</td><td>No</td></tr>
+      <tr><td><code>.claude/settings.json</code></td><td>このプロジェクト</td><td>Yes（コミット可）</td></tr>
+      <tr><td><code>.claude/settings.local.json</code></td><td>このプロジェクト</td><td>No（gitignore 推奨）</td></tr>
+      <tr><td>Managed policy settings</td><td>組織全体</td><td>Yes（管理者制御）</td></tr>
+      <tr><td>Plugin <code>hooks/hooks.json</code></td><td>プラグインが有効な場所</td><td>Yes</td></tr>
+      <tr><td>Skill / Agent フロントマター</td><td>コンポーネントがアクティブな間</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Matcher パターン</h3>
+  <table>
+    <thead><tr><th>Matcher 値</th><th>評価方法</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>単一ツール名 / 列挙</td><td>完全一致または <code>|</code> で OR</td><td><code>Bash</code>, <code>Edit|Write</code></td></tr>
+      <tr><td>正規表現</td><td><code>^</code> や <code>.*</code> を含む、または <code>?+{[</code> を含む</td><td><code>mcp__.*</code>, <code>^Bash$</code></td></tr>
+      <tr><td>空文字列</td><td>全イベントにマッチ</td><td><code>""</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>代表的なパターン例</h3>
+
+  <h4>コード自動フォーマット（PostToolUse + Edit|Write）</h4>
+  <pre><code>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+  <h4>保護ファイルへの編集をブロック（PreToolUse + exit 2）</h4>
+  <pre><code>#!/bin/bash
+# protect-files.sh
+INPUT=$(cat)
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+PROTECTED_PATTERNS=(".env" "package-lock.json" ".git/")
+for pattern in "${PROTECTED_PATTERNS[@]}"; do
+  if [[ "$FILE_PATH" == *"$pattern"* ]]; then
+    echo "Blocked: $FILE_PATH matches protected pattern '$pattern'" &gt;&amp;2
+    exit 2
+  fi
+done
+exit 0</code></pre>
+
+  <h4>コンパクション後のコンテキスト再注入（SessionStart + compact）</h4>
+  <pre><code>{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Reminder: use Bun, not npm. Run bun test before committing.'"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>Hooks は「頼む」ではなく「強制する」手段。<code>PreToolUse</code> で <code>.env</code> 編集をブロックすれば確実に防げる</li>
+    <li>同一イベントの複数 Hook は<strong>並列実行</strong>。deny が 1 つでもあればブロック</li>
+    <li><code>type: "command"</code> はシェルフォームと exec フォームを選べる。パスに空白があるなら exec 形式</li>
+    <li>Matcher は大文字小文字を区別する（<code>Bash</code> と <code>bash</code> は別）</li>
+    <li>Skill/Agent フロントマター内の Hook はそのコンポーネントがアクティブな間だけ有効</li>
+    <li><code>/hooks</code> メニューで設定確認可（読み取り専用）</li>
+  </ul>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../04-hooks-io-and-patterns/index.html">04-hooks-io-and-patterns/</a> — Hooks の I/O・デシジョン制御・高度なパターン</li>
+  </ul>
+
+  <div class="footer-nav">← <a href="../main.md">Phase 3 Markdown 目次（main.md）</a></div>
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hooks I/O・デシジョン制御・高度なパターン — Phase 3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    blockquote { border-left: 3px solid #3d7fc1; background: #f6faff; padding: 10px 16px; border-radius: 0 4px 4px 0; color: #444; margin: 16px 0; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">← <a href="../index.html">Phase 3 トップ</a></div>
+</header>
+<div class="container">
+
+  <h1>Hooks I/O・デシジョン制御・高度なパターン</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/hooks" target="_blank">Hooks reference</a>（後半）および <a href="https://code.claude.com/docs/en/hooks-guide" target="_blank">Automate actions with hooks</a>（後半）（閲覧日 2026-06-12）<br>
+    このノートは hooks リファレンスの I/O フォーマット・デシジョン制御・高度なパターン・安全考察を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>Hook の「入出力」と「デシジョン制御」は、単なるシェルコマンド実行を超えた高度な制御を可能にする。stdin でイベントデータを受け取り、stdout と終了コードで Claude Code の動作を制御する。JSON 出力でより細かい決定（allow/deny/defer/ask）や追加コンテキストの注入もできる。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>共通入力フィールド（stdin に渡される JSON）</h3>
+  <table>
+    <thead><tr><th>フィールド</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td><code>session_id</code></td><td>現在のセッション ID</td></tr>
+      <tr><td><code>transcript_path</code></td><td>セッション transcript ファイルのパス</td></tr>
+      <tr><td><code>cwd</code></td><td>イベント発火時の作業ディレクトリ</td></tr>
+      <tr><td><code>permission_mode</code></td><td>現在のパーミッションモード</td></tr>
+      <tr><td><code>hook_event_name</code></td><td>フックを起動したイベント名</td></tr>
+      <tr><td><code>agent_id</code></td><td>サブエージェントコンテキストの場合、サブエージェント ID</td></tr>
+      <tr><td><code>agent_type</code></td><td>サブエージェントコンテキストの場合、エージェントタイプ</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Exit Code Output（終了コードによる出力）</h3>
+  <table>
+    <thead><tr><th>終了コード</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Exit 0</strong></td><td>成功・異議なし。<code>UserPromptSubmit</code> / <code>SessionStart</code> では stdout のテキストが Claude のコンテキストに追加</td></tr>
+      <tr><td><strong>Exit 2</strong></td><td>アクションをブロック。stderr に書いた理由が Claude にフィードバックとして返る</td></tr>
+      <tr><td><strong>その他</strong></td><td>非ブロックエラー。アクションは進む</td></tr>
+    </tbody>
+  </table>
+
+  <blockquote>
+    <strong>注意</strong>: JSON 出力を使う場合は exit 0 にする。exit 2 のときは JSON が無視される。
+  </blockquote>
+
+  <h3>JSON Output（構造化出力）</h3>
+
+  <h4>PreToolUse の permissionDecision 値</h4>
+  <table>
+    <thead><tr><th>値</th><th>挙動</th></tr></thead>
+    <tbody>
+      <tr><td><code>"allow"</code></td><td>インタラクティブなパーミッションプロンプトをスキップ（deny ルールは引き続き適用）</td></tr>
+      <tr><td><code>"deny"</code></td><td>ツール呼び出しをキャンセルし、reason を Claude に返す</td></tr>
+      <tr><td><code>"ask"</code></td><td>ユーザーにパーミッションプロンプトを通常通り表示</td></tr>
+      <tr><td><code>"defer"</code></td><td>非インタラクティブモード（<code>-p</code>）でプロセスを終了し、Agent SDK が再開できるようにする</td></tr>
+    </tbody>
+  </table>
+
+  <h4>デシジョンコントロール サマリー</h4>
+  <table>
+    <thead><tr><th>イベント</th><th>デシジョンパターン</th></tr></thead>
+    <tbody>
+      <tr><td><code>UserPromptSubmit</code>, <code>Stop</code> 等</td><td>トップレベル <code>{"decision": "block", "reason": "..."}</code></td></tr>
+      <tr><td><code>PreToolUse</code>, <code>PermissionRequest</code> 等</td><td><code>hookSpecificOutput.permissionDecision</code> 等</td></tr>
+      <tr><td><code>WorktreeCreate</code></td><td><code>worktreePath</code> を返す</td></tr>
+      <tr><td><code>SessionStart</code>, <code>Setup</code> 等</td><td>stdout テキストが Claude のコンテキストに追加</td></tr>
+      <tr><td><code>SessionEnd</code>, <code>Notification</code> 等</td><td>なし（ブロック不可）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>特別な JSON フィールド</h3>
+  <pre><code>// 端末通知
+{ "terminalSequence": "]777;notify;Claude Code;done" }
+
+// Claude へのコンテキスト注入
+{ "additionalContext": "Branch: feature/auth\nUncommitted: 3 files" }</code></pre>
+
+  <h3>HTTP フック</h3>
+  <pre><code>{
+  "hooks": {
+    "PostToolUse": [{
+      "hooks": [{
+        "type": "http",
+        "url": "http://localhost:8080/hooks/tool-use",
+        "headers": { "Authorization": "Bearer $MY_TOKEN" },
+        "allowedEnvVars": ["MY_TOKEN"]
+      }]
+    }]
+  }
+}</code></pre>
+
+  <h3>プロンプトベースフック（type: "prompt"）</h3>
+  <pre><code>{
+  "hooks": {
+    "Stop": [{
+      "hooks": [{
+        "type": "prompt",
+        "prompt": "Check if all tasks are complete. If not, respond with {\"ok\": false, \"reason\": \"what remains\"}."
+      }]
+    }]
+  }
+}</code></pre>
+
+  <h3>エージェントベースフック（type: "agent"、実験的）</h3>
+  <pre><code>{
+  "hooks": {
+    "Stop": [{
+      "hooks": [{
+        "type": "agent",
+        "prompt": "Verify that all unit tests pass.",
+        "timeout": 120
+      }]
+    }]
+  }
+}</code></pre>
+
+  <h3>セキュリティ考察</h3>
+  <ul>
+    <li>Hook のスクリプトはシェルで実行されるため、入力に悪意のあるデータが含まれる可能性を考慮すること</li>
+    <li><code>PreToolUse</code> フックは <code>bypassPermissions</code> モードでも発火する</li>
+    <li>Hook が <code>"allow"</code> を返しても settings の deny ルールは覆せない。Hook はルールを厳しくはできるが緩めることはできない</li>
+    <li><code>PermissionRequest</code> フックは非インタラクティブモード（<code>-p</code>）では発火しない。自動 CI では <code>PreToolUse</code> を使う</li>
+  </ul>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li><strong>exit 0 + JSON</strong> で細かい制御。<strong>exit 2</strong> でシンプルなブロック。両方使うと JSON が無視される</li>
+    <li><code>"allow"</code> は prompt をスキップするが deny ルールは優先される</li>
+    <li><code>additionalContext</code> で Claude のコンテキストにテキストを注入</li>
+    <li>prompt フック（Haiku）は ok/not-ok の判断のみ。agent フック（50 ターン）は実際にコードを調べられる</li>
+    <li><code>CLAUDE_ENV_FILE</code> に書き込むと環境変数を Bash コマンドをまたいで永続化できる</li>
+    <li>Stop フックは 8 回連続ブロックでオーバーライドされる。<code>stop_hook_active</code> フラグを確認してループを防ぐ</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>PreToolUse で破壊的コマンドをブロック</h3>
+  <pre><code>#!/bin/bash
+INPUT=$(cat)
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command')
+if echo "$COMMAND" | grep -q "rm -rf"; then
+  echo "Blocked: rm -rf is not allowed" &gt;&amp;2
+  exit 2
+fi
+exit 0</code></pre>
+
+  <h3>Stop フックの無限ループ防止</h3>
+  <pre><code>#!/bin/bash
+INPUT=$(cat)
+if [ "$(echo "$INPUT" | jq -r '.stop_hook_active')" = "true" ]; then
+  exit 0  # Claude を止める
+fi
+# ... フックのメインロジック</code></pre>
+
+  <h3>自動承認（PermissionRequest + ExitPlanMode）</h3>
+  <pre><code>{
+  "hooks": {
+    "PermissionRequest": [{
+      "matcher": "ExitPlanMode",
+      "hooks": [{
+        "type": "command",
+        "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"PermissionRequest\", \"decision\": {\"behavior\": \"allow\"}}}'"
+      }]
+    }]
+  }
+}</code></pre>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../05-subagents/index.html">05-subagents/</a> — カスタムサブエージェントの作成と設定</li>
+  </ul>
+
+  <div class="footer-nav">← <a href="../main.md">Phase 3 Markdown 目次（main.md）</a></div>
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

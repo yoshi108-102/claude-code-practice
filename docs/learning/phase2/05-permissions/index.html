@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>権限ルール — allow / ask / deny — Phase 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    .source-note a:hover { text-decoration: underline; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    blockquote { border-left: 3px solid #3d7fc1; background: #f6faff; padding: 10px 16px; border-radius: 0 4px 4px 0; color: #444; margin: 16px 0; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .footer-nav a:hover { text-decoration: underline; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    ← <a href="../index.html">Phase 2 トップ</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>権限ルール — allow / ask / deny</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/permissions" target="_blank">Configure permissions</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「Configure permissions」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>permission は「Claude Code が<strong>何をしてよく、何をしてはいけないか</strong>」を細かく決める仕組み。CLAUDE.md はガイド（強制ではない）だが、permission は <strong>Claude Code（クライアント）が強制する</strong> 実行制御の本体。プロンプトや CLAUDE.md で何を言われても、permission が許さなければ実行されない。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>3 種類のルールと評価順</h3>
+  <table>
+    <thead><tr><th>ルール</th><th>効果</th></tr></thead>
+    <tbody>
+      <tr><td><strong>allow</strong></td><td>確認なしで実行を許可</td></tr>
+      <tr><td><strong>ask</strong></td><td>毎回確認プロンプトを出す</td></tr>
+      <tr><td><strong>deny</strong></td><td>実行を禁止</td></tr>
+    </tbody>
+  </table>
+
+  <p>評価順は <strong>deny → ask → allow</strong>、最初にマッチしたルールが勝つ。<strong>deny は常に最優先</strong>。</p>
+
+  <p>ツール呼び出しの大まかな自動承認規則（参考）:</p>
+  <table>
+    <thead><tr><th>ツール種別</th><th>例</th><th>承認要否</th></tr></thead>
+    <tbody>
+      <tr><td>Read-only</td><td>ファイル読み取り、Grep</td><td>不要</td></tr>
+      <tr><td>Bash コマンド</td><td>シェル実行</td><td>必要（初回は "Yes, don't ask again" で恒久許可）</td></tr>
+      <tr><td>ファイル編集</td><td>Edit/Write</td><td>必要（セッション終了まで有効）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>deny の 2 種類の挙動</h4>
+  <ul>
+    <li><strong>裸のツール名</strong>（<code>Bash</code>）→ ツールごと Claude の context から消える（Claude が存在を知らない）</li>
+    <li><strong>スコープ付き</strong>（<code>Bash(rm *)</code>）→ ツールは使えるが、マッチする呼び出しだけブロック</li>
+  </ul>
+
+  <h3>permission ルール構文</h3>
+  <p>ルール書式: <code>Tool</code> または <code>Tool(specifier)</code></p>
+
+  <h4>ツール全体をマッチ</h4>
+  <table>
+    <thead><tr><th>ルール</th><th>効果</th></tr></thead>
+    <tbody>
+      <tr><td><code>Bash</code></td><td>全 Bash コマンドにマッチ</td></tr>
+      <tr><td><code>WebFetch</code></td><td>全 WebFetch にマッチ</td></tr>
+      <tr><td><code>Read</code></td><td>全ファイル読み取りにマッチ</td></tr>
+    </tbody>
+  </table>
+  <p><code>Bash(*)</code> は <code>Bash</code> と等価（全 Bash コマンドにマッチ）。</p>
+
+  <h4>指定子で細かく制御</h4>
+  <table>
+    <thead><tr><th>ルール</th><th>効果</th></tr></thead>
+    <tbody>
+      <tr><td><code>Bash(npm run build)</code></td><td>完全一致 <code>npm run build</code> のみ</td></tr>
+      <tr><td><code>Read(./.env)</code></td><td>cwd 直下の <code>.env</code> ファイルの読み取り</td></tr>
+      <tr><td><code>WebFetch(domain:example.com)</code></td><td>example.com へのフェッチのみ</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Bash のワイルドカード詳細</h3>
+  <p><code>*</code> は任意位置に置ける。<strong>スペースの有無が語境界を決める</strong>:</p>
+  <ul>
+    <li><code>Bash(ls *)</code> → <code>ls -la</code> にマッチするが <code>lsof</code> には<strong>しない</strong>（語境界あり）</li>
+    <li><code>Bash(ls*)</code> → <code>lsof</code> にも<strong>マッチ</strong>（語境界なし）</li>
+    <li><code>Bash(ls:*)</code> は <code>Bash(ls *)</code> と等価（末尾限定の書き方）</li>
+    <li><code>*</code> 1 つで複数の引数をまたいでマッチする。<code>Bash(git *)</code> は <code>git log --oneline --all</code> にもマッチ</li>
+  </ul>
+
+  <h4>複合コマンドのルール</h4>
+  <p>Claude Code はシェル演算子（<code>&amp;&amp;</code>/<code>||</code>/<code>;</code>/<code>|</code>/<code>|&amp;</code>/<code>&amp;</code>/改行）を認識し、各サブコマンドを<strong>独立に</strong>評価する。<code>Bash(safe-cmd *)</code> は <code>safe-cmd &amp;&amp; other-cmd</code> を許可しない（各サブコマンドが別々にマッチ必須）。</p>
+
+  <h4>プロセスラッパーの剥がし</h4>
+  <p><code>timeout</code>/<code>time</code>/<code>nice</code>/<code>nohup</code>/<code>stdbuf</code>/bare <code>xargs</code> は照合前に剥がされる。<code>Bash(npm test *)</code> は <code>timeout 30 npm test</code> にもマッチ。ただし <code>devbox run</code>/<code>npx</code>/<code>docker exec</code> 等の<strong>環境ランナーは剥がされない</strong> → <code>Bash(devbox run *)</code> は <code>devbox run rm -rf .</code> まで許可してしまう。ランナー+内部コマンドを明示するのが安全: <code>Bash(devbox run npm test)</code>。</p>
+
+  <h4>read-only コマンドの自動許可</h4>
+  <p><code>ls</code>/<code>cat</code>/<code>echo</code>/<code>grep</code>/<code>find</code>/<code>cd</code>/<code>head</code>/<code>tail</code> 等の read-only コマンドは全モードで自動承認される（設定不要）。</p>
+
+  <h3>Read/Edit のパスパターン（gitignore 仕様）</h3>
+  <table>
+    <thead><tr><th>パターン</th><th>意味</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td><code>//path</code></td><td><strong>絶対</strong>パス（FS ルート）</td><td><code>Read(//Users/alice/secrets/**)</code></td></tr>
+      <tr><td><code>~/path</code></td><td><strong>ホーム</strong>から</td><td><code>Read(~/Documents/*.pdf)</code></td></tr>
+      <tr><td><code>/path</code></td><td><strong>プロジェクトルート</strong>から</td><td><code>Edit(/src/**/*.ts)</code></td></tr>
+      <tr><td><code>path</code> / <code>./path</code></td><td><strong>cwd</strong>から</td><td><code>Read(*.env)</code></td></tr>
+    </tbody>
+  </table>
+
+  <blockquote>
+    ⚠️ <strong><code>/Users/alice/file</code> は絶対パスではない</strong>。プロジェクトルート基準になる。絶対パスは <code>//Users/alice/file</code>。
+  </blockquote>
+
+  <ul>
+    <li><code>*</code> は単一ディレクトリ内のみ、<code>**</code> はディレクトリをまたいで再帰マッチ</li>
+    <li>シンボリックリンク: allow は symlink とその解決先の<strong>両方が</strong>マッチ必要。deny は<strong>いずれか</strong>がマッチで適用</li>
+  </ul>
+
+  <h3>ツール別ルール</h3>
+
+  <h4>WebFetch</h4>
+  <ul>
+    <li><code>WebFetch(domain:example.com)</code> → example.com へのフェッチのみ許可</li>
+  </ul>
+
+  <h4>MCP ツール</h4>
+  <ul>
+    <li><code>mcp__puppeteer</code> → <code>puppeteer</code> サーバーのツール全体</li>
+    <li><code>mcp__puppeteer__*</code> → ワイルドカードで全ツール（同等）</li>
+    <li><code>mcp__puppeteer__navigate</code> → 特定ツールのみ</li>
+  </ul>
+  <p>allow でツール名にワイルドカードを使う場合は <code>mcp__&lt;server&gt;__</code> のリテラルプレフィックスが必須（サーバー名はワイルドカード不可）。deny/ask はツール名全体でのワイルドカード（<code>mcp__*</code> 等）が使える。</p>
+
+  <h4>Agent（subagent）</h4>
+  <ul>
+    <li><code>Agent(Explore)</code> → Explore subagent</li>
+    <li><code>Agent(Plan)</code> → Plan subagent</li>
+    <li><code>Agent(my-custom-agent)</code> → カスタム subagent</li>
+  </ul>
+
+  <h3>優先順位とマージ</h3>
+  <p>permission は全スコープで<strong>マージ</strong>:</p>
+  <pre><code>Managed &gt; CLI 引数 &gt; Local &gt; Project &gt; User</code></pre>
+  <p><strong>どこかで deny されたら、他のどのレベルでも allow できない</strong>。managed の deny は <code>--allowedTools</code> でも覆せない。</p>
+
+  <h3>Managed 設定での強制</h3>
+  <table>
+    <thead><tr><th>設定</th><th>効果</th></tr></thead>
+    <tbody>
+      <tr><td><code>allowManagedPermissionRulesOnly: true</code></td><td>user/project の allow/ask/deny を無効化</td></tr>
+      <tr><td><code>permissions.disableBypassPermissionsMode: "disable"</code></td><td>bypassPermissions モードを組織封印</td></tr>
+      <tr><td><code>permissions.disableAutoMode: "disable"</code></td><td>auto モードを組織封印</td></tr>
+    </tbody>
+  </table>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li><strong>permission はクライアントが強制</strong>。CLAUDE.md/プロンプトでは覆せない</li>
+    <li>評価順 <strong>deny → ask → allow</strong>、最初のマッチが勝つ。<strong>deny 最優先</strong></li>
+    <li>裸の <code>Bash</code>（deny）= context から消す / <code>Bash(rm *)</code>（deny）= 使えるが該当だけブロック</li>
+    <li>Bash ワイルドは<strong>スペースで語境界</strong>、複合コマンドは各部マッチ必須</li>
+    <li>環境ランナー（devbox/npx/docker）は剥がされず危険 → ランナー+内部コマンドを明示</li>
+    <li>Read/Edit パスは gitignore 仕様。<strong><code>/path</code> はプロジェクトルート、絶対は <code>//path</code></strong></li>
+    <li>全スコープ<strong>マージ + deny 最優先</strong> → 「一度 deny したら誰も allow できない」</li>
+    <li>URL 引数で curl を制限するのは脆い → <code>Bash(curl *)</code> を deny して <code>WebFetch(domain:...)</code> を使う</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>npm/git commit は許可、git push は禁止</h3>
+  <pre><code>{
+  "permissions": {
+    "allow": ["Bash(npm run *)", "Bash(git commit *)", "Bash(git * main)"],
+    "deny":  ["Bash(git push *)"]
+  }
+}</code></pre>
+
+  <h3>.env や secrets を読ませない</h3>
+  <pre><code>{
+  "permissions": {
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"]
+  }
+}</code></pre>
+
+  <h3>MCP ツール全体を無効化</h3>
+  <pre><code>{
+  "permissions": {
+    "deny": ["mcp__*"]
+  }
+}</code></pre>
+
+  <h3>eval/exec 系は都度確認（ask）、それ以外は許可</h3>
+  <pre><code>{
+  "permissions": {
+    "ask":  ["Bash(eval *)", "Bash(exec *)"],
+    "allow": ["Bash(npm run *)"]
+  }
+}</code></pre>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../06-permission-modes/index.html">06-permission-modes/</a> — permission モード（6 種類）</li>
+  </ul>
+
+  <div class="footer-nav">
+    ← <a href="../main.md">Phase 2 Markdown 目次（main.md）</a>
+  </div>
+
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

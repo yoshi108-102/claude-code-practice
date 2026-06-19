@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>環境変数とモデル設定 — Phase 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    .source-note a:hover { text-decoration: underline; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    blockquote { border-left: 3px solid #3d7fc1; background: #f6faff; padding: 10px 16px; border-radius: 0 4px 4px 0; color: #444; margin: 16px 0; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .footer-nav a:hover { text-decoration: underline; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    ← <a href="../index.html">Phase 2 トップ</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>環境変数とモデル設定</h1>
+
+  <div class="source-note">
+    出典:
+    <a href="https://code.claude.com/docs/en/env-vars" target="_blank">Environment variables</a>（閲覧日 2026-06-12）、
+    <a href="https://code.claude.com/docs/en/model-config" target="_blank">Model configuration</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメント「env-vars」「model-config」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>settings.json の中でも特によく使う 2 系統 — <strong>環境変数（env）</strong> と <strong>モデル設定</strong> をまとめて扱う。どちらも「セッションの挙動を外から差し込む」手段。優先順位の感覚と、それぞれのキルスイッチ・ピン留め方法が実務で効く。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>環境変数の設定方法</h3>
+  <p>3 つの経路:</p>
+  <ol>
+    <li><strong>シェルで直接</strong>（macOS/Linux: <code>export VAR=value</code>、PowerShell: <code>$env:VAR = "value"</code>）</li>
+    <li><strong>settings.json の <code>env</code> キー</strong>（スコープ階層あり）</li>
+    <li>一部は <strong><code>.env</code></strong> ファイルから読み込まれる</li>
+  </ol>
+
+  <pre><code>{
+  "env": {
+    "API_TIMEOUT_MS": "1200000",
+    "BASH_DEFAULT_TIMEOUT_MS": "300000"
+  }
+}</code></pre>
+
+  <p>設定ファイルの <code>env</code> スコープは settings と同じ（user/project/local/managed）。</p>
+
+  <h3>優先順位</h3>
+  <pre><code>環境変数（シェル）&gt; CLI フラグ/セッションコマンド &gt; 設定ファイル</code></pre>
+  <p>例: <code>ANTHROPIC_MODEL</code> は <code>model</code> 設定を上書きするが、<code>--model</code> や <code>/model</code> が <code>ANTHROPIC_MODEL</code> を上書きする。</p>
+
+  <h3>よく使う環境変数（目的別）</h3>
+
+  <h4>認証</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>ANTHROPIC_API_KEY</code></td><td>直接認証の API キー（サブスクリプションより優先）</td></tr>
+      <tr><td><code>ANTHROPIC_AUTH_TOKEN</code></td><td><code>Authorization</code> ヘッダーのカスタム値</td></tr>
+    </tbody>
+  </table>
+
+  <h4>API/ネットワーク</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>ANTHROPIC_BASE_URL</code></td><td>プロキシ/ゲートウェイへルーティング（<strong>モデルは変わらない</strong>）</td></tr>
+      <tr><td><code>API_TIMEOUT_MS</code></td><td>タイムアウト（デフォルト 600000 = 10 分）</td></tr>
+      <tr><td><code>ANTHROPIC_CUSTOM_HEADERS</code></td><td>カスタムヘッダー（<code>Name: Value</code> 形式）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>モデル選択</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>ANTHROPIC_MODEL</code></td><td>デフォルトモデル名（セッション限定）</td></tr>
+      <tr><td><code>ANTHROPIC_DEFAULT_OPUS_MODEL</code></td><td><code>opus</code> エイリアスの解決先をピン留め</td></tr>
+      <tr><td><code>ANTHROPIC_DEFAULT_SONNET_MODEL</code></td><td><code>sonnet</code> エイリアスの解決先をピン留め</td></tr>
+      <tr><td><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code></td><td><code>haiku</code> エイリアスの解決先をピン留め</td></tr>
+      <tr><td><code>ANTHROPIC_DEFAULT_FABLE_MODEL</code></td><td><code>fable</code> エイリアスの解決先をピン留め</td></tr>
+      <tr><td><code>CLAUDE_CODE_SUBAGENT_MODEL</code></td><td>全 subagent のモデルを強制（<code>inherit</code> で通常解決）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>推論・努力度</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLAUDE_CODE_EFFORT_LEVEL</code></td><td>努力度（<code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code>/<code>max</code>/<code>auto</code>）。<code>/effort</code> を上書き</td></tr>
+      <tr><td><code>MAX_THINKING_TOKENS</code></td><td>固定思考予算（Opus 4.6/Sonnet 4.6 の固定バジェットモード用）</td></tr>
+      <tr><td><code>CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING</code></td><td>適応的推論を無効化（Opus 4.6/Sonnet 4.6 のみ）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>機能の ON/OFF（キルスイッチ）</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLAUDE_CODE_DISABLE_AUTO_MEMORY</code></td><td>auto memory 無効化（Phase 2 Task 1）</td></tr>
+      <tr><td><code>CLAUDE_CODE_DISABLE_CLAUDE_MDS</code></td><td>CLAUDE.md ロード無効化</td></tr>
+      <tr><td><code>CLAUDE_CODE_DISABLE_BACKGROUND_TASKS</code></td><td>バックグラウンドタスク全体を無効化</td></tr>
+      <tr><td><code>CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING</code></td><td><code>/rewind</code> 無効化</td></tr>
+      <tr><td><code>CLAUDE_CODE_DISABLE_1M_CONTEXT</code></td><td>1M コンテキストウィンドウ無効化</td></tr>
+      <tr><td><code>CLAUDE_CODE_DISABLE_FAST_MODE</code></td><td>fast mode 無効化</td></tr>
+      <tr><td><code>CLAUDE_CODE_ENABLE_AUTO_MODE</code></td><td>Bedrock/Vertex/Foundry で auto mode 有効化（v2.1.158+）</td></tr>
+      <tr><td><code>ENABLE_TOOL_SEARCH</code></td><td>MCP tool search 有効化（Phase 1 Task 3 で既出）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>コンテキスト管理</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLAUDE_AUTOCOMPACT_PCT_OVERRIDE</code></td><td>自動 compact の発火%（1〜100、デフォルト 95）</td></tr>
+      <tr><td><code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code></td><td>自動圧縮計算用コンテキスト容量（トークン）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Bash タイムアウト</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>BASH_DEFAULT_TIMEOUT_MS</code></td><td>長時間実行コマンドのデフォルトタイムアウト（デフォルト 120000）</td></tr>
+      <tr><td><code>BASH_MAX_TIMEOUT_MS</code></td><td>モデルが設定可能な最大タイムアウト（デフォルト 600000）</td></tr>
+      <tr><td><code>BASH_MAX_OUTPUT_LENGTH</code></td><td>Bash 出力の最大文字数（超過時はファイルに保存）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>テレメトリ</h4>
+  <table>
+    <thead><tr><th>変数</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>DISABLE_TELEMETRY</code></td><td>テレメトリ全体を無効化</td></tr>
+      <tr><td><code>CLAUDE_CODE_ENABLE_TELEMETRY</code></td><td>OpenTelemetry データ収集を有効化</td></tr>
+      <tr><td><code>DO_NOT_TRACK</code></td><td>トラッキング無効化</td></tr>
+    </tbody>
+  </table>
+
+  <h3>モデルの選び方（優先順位順）</h3>
+  <ol>
+    <li><strong>セッション中</strong>: <code>/model &lt;alias|name&gt;</code>（引数なしでピッカー）</li>
+    <li><strong>起動時</strong>: <code>claude --model &lt;alias|name&gt;</code></li>
+    <li><strong>環境変数</strong>: <code>ANTHROPIC_MODEL=&lt;alias|name&gt;</code></li>
+    <li><strong>settings</strong>: <code>model</code> フィールド（恒久）</li>
+  </ol>
+  <p>v2.1.153 以降、<code>/model</code> でモデルを選ぶとユーザー設定の <code>model</code> フィールドに保存されデフォルトになる（セッションのみに留めるには picker 内で <code>s</code> を押す）。</p>
+  <p><code>--model</code> フラグと <code>ANTHROPIC_MODEL</code> は起動したセッションにのみ有効。<code>--resume</code> 時は保存時のモデルを維持する。</p>
+
+  <h3>モデルエイリアス</h3>
+  <table>
+    <thead><tr><th>エイリアス</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td><code>default</code></td><td>オーバーライドを解除してアカウント種別の推奨モデルに戻す</td></tr>
+      <tr><td><code>best</code></td><td>最も高性能（Fable 5 が利用可能ならそちら、なければ最新 Opus）</td></tr>
+      <tr><td><code>fable</code></td><td>Claude Fable 5（最長・最高性能。v2.1.170+）</td></tr>
+      <tr><td><code>sonnet</code></td><td>日常コーディング向け最新 Sonnet</td></tr>
+      <tr><td><code>opus</code></td><td>複雑な推論向け最新 Opus</td></tr>
+      <tr><td><code>haiku</code></td><td>高速・軽量</td></tr>
+      <tr><td><code>sonnet[1m]</code> / <code>opus[1m]</code></td><td>1M トークンコンテキスト版</td></tr>
+      <tr><td><code>opusplan</code></td><td><strong>plan モード中は opus、実行に移ると sonnet</strong> に自動切替（コスト最適）</td></tr>
+    </tbody>
+  </table>
+  <p>Anthropic API では <code>opus</code> = Opus 4.8、<code>sonnet</code> = Sonnet 4.6 に解決。Bedrock/Vertex/Foundry では少し古いバージョンに解決されるため、ピン留めには full model name か <code>ANTHROPIC_DEFAULT_*_MODEL</code> を使うのが安全。</p>
+
+  <h4>デフォルトモデル（アカウント種別）</h4>
+  <table>
+    <thead><tr><th>アカウント種別</th><th>デフォルト</th></tr></thead>
+    <tbody>
+      <tr><td>Max / Team Premium / Enterprise pay-as-you-go / Anthropic API</td><td>Opus 4.8</td></tr>
+      <tr><td>Claude Platform on AWS</td><td>Opus 4.7</td></tr>
+      <tr><td>Pro / Team Standard / Enterprise subscription seats</td><td>Sonnet 4.6</td></tr>
+      <tr><td>Bedrock / Vertex / Foundry</td><td>Sonnet 4.5</td></tr>
+    </tbody>
+  </table>
+
+  <h3>努力度（effort level）</h3>
+  <p><code>/effort</code>、<code>--effort</code>、<code>CLAUDE_CODE_EFFORT_LEVEL</code>、settings の <code>effortLevel</code> で設定。</p>
+  <table>
+    <thead><tr><th>レベル</th><th>いつ使う</th></tr></thead>
+    <tbody>
+      <tr><td><code>low</code></td><td>短く範囲が狭く、速度優先のタスク</td></tr>
+      <tr><td><code>medium</code></td><td>コスト重視で多少の性能ダウンを許容</td></tr>
+      <tr><td><code>high</code></td><td>バランス。Fable 5/Opus 4.8/Opus 4.6/Sonnet 4.6 のデフォルト</td></tr>
+      <tr><td><code>xhigh</code></td><td>深い推論。Opus 4.7 のデフォルト</td></tr>
+      <tr><td><code>max</code></td><td>最大推論（セッション限定。settings には設定不可）</td></tr>
+      <tr><td><code>ultracode</code></td><td>xhigh + dynamic workflow（セッション限定）</td></tr>
+    </tbody>
+  </table>
+  <p><code>ultrathink</code> をプロンプトに書くとそのターンだけ深く考える（API には <code>xhigh</code> 相当が送られる。<code>think harder</code> 等は通常テキストとして扱われ認識されない）。</p>
+
+  <h3>モデル設定の組織制御（3 点セット）</h3>
+  <p>完全に制御するには 3 つを組み合わせる:</p>
+  <table>
+    <thead><tr><th>設定</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><code>availableModels</code></td><td>ユーザーが選べるモデルを制限</td></tr>
+      <tr><td><code>model</code></td><td>起動時の初期モデル選択</td></tr>
+      <tr><td><code>ANTHROPIC_DEFAULT_*_MODEL</code></td><td>エイリアスの解決先を固定（Default 選択時も制御）</td></tr>
+    </tbody>
+  </table>
+  <p><code>model</code> を設定してもユーザーが <code>/model</code> で <code>default</code> を選ぶと最新版に戻る → 完全固定には <code>ANTHROPIC_DEFAULT_*_MODEL</code> との組み合わせが必要。</p>
+
+  <h3>フォールバックモデル</h3>
+  <p>過負荷/不可用時のフォールバック設定:</p>
+  <pre><code>{
+  "fallbackModel": ["claude-sonnet-4-6", "claude-haiku-4-5"]
+}</code></pre>
+  <p>起動時フラグ: <code>claude --fallback-model sonnet,haiku</code>。チェーンは最大 3 モデルまで。</p>
+
+  <h3>1M コンテキストウィンドウ</h3>
+  <p>Fable 5、Opus 4.6+、Sonnet 4.6 が対応。<code>[1m]</code> サフィックスで明示指定:</p>
+  <pre><code>/model opus[1m]
+/model claude-opus-4-8[1m]</code></pre>
+  <p>Max/Team/Enterprise では Opus の 1M コンテキストは subscription 込み。Sonnet の 1M は全プランで usage credits 必要。無効化: <code>CLAUDE_CODE_DISABLE_1M_CONTEXT=1</code>。</p>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>env は 3 経路（shell / settings.env / <code>.env</code>）。<strong>env は settings を上書き、CLI/<code>/model</code> が env を上書き</strong></li>
+    <li>Phase 1〜2 で出てきた機能の多くに <strong>env のキルスイッチ</strong>がある（auto memory / background / checkpoint / tool search 等）</li>
+    <li>モデル選択の優先順位: <strong><code>/model</code>・<code>--model</code>・<code>ANTHROPIC_MODEL</code>（セッション限定）&gt; settings.model（恒久）</strong></li>
+    <li>エイリアス <code>opusplan</code> = <strong>plan で opus、実行で sonnet</strong> に自動切替（コスト最適の定番）</li>
+    <li>effort は推論の深さ。<code>ultrathink</code> でそのターンだけ深く考える</li>
+    <li><code>availableModels</code>（managed）で組織のモデル allowlist を強制、<code>CLAUDE_CODE_SUBAGENT_MODEL</code> で subagent モデル全体を強制</li>
+    <li><code>ANTHROPIC_BASE_URL</code> は<strong>送り先を変えるだけでモデルは変えない</strong>（混同注意）</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>モデル指定の優先順位</h3>
+  <pre><code>/model sonnet（セッション中・即時・ユーザー設定に保存）
+  ↑ 上書き
+claude --model opus（起動時・セッション限定）
+ANTHROPIC_MODEL=opus（env・セッション限定）
+  ↑ 上書き
+settings.json "model": "opus"（恒久デフォルト）</code></pre>
+
+  <h3>opusplan で計画は賢く・実行は安く</h3>
+  <pre><code>{ "model": "opusplan" }</code></pre>
+  <pre><code>plan モード   → opus（設計・推論）
+実行モード    → sonnet（コード生成）</code></pre>
+
+  <h3>組織でモデルを固定する（3 点セット）</h3>
+  <pre><code>{
+  "model": "claude-sonnet-4-5",
+  "availableModels": ["claude-sonnet-4-5", "haiku"],
+  "env": {
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-5"
+  }
+}</code></pre>
+  <p>→ <code>env</code> がないと、ユーザーが <code>/model</code> で <code>default</code> を選んだときに最新版に逃げられる。</p>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <div class="footer-nav">
+    ← <a href="../main.md">Phase 2 Markdown 目次（main.md）</a>
+  </div>
+
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

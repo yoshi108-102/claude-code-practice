@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phase 3 — 拡張機能</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 6px; }
+    .topic-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 24px 0; }
+    .topic-card { border: 1px solid #dde3ea; border-radius: 8px; padding: 16px 20px; background: #fff; transition: border-color 0.15s, box-shadow 0.15s; }
+    .topic-card:hover { border-color: #3d7fc1; box-shadow: 0 2px 8px rgba(61,127,193,0.12); }
+    .topic-card .num { font-size: 12px; color: #999; font-family: 'Noto Sans Mono', monospace; margin-bottom: 4px; }
+    .topic-card .title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+    .topic-card .title a { color: inherit; text-decoration: none; }
+    .topic-card .title a:hover { color: #3d7fc1; }
+    .topic-card .desc { font-size: 13.5px; color: #555; line-height: 1.6; }
+    .topic-card .links { margin-top: 10px; font-size: 12.5px; }
+    .topic-card .links a { color: #3d7fc1; margin-right: 12px; }
+    .phase-badge { display: inline-block; background: #3d7fc1; color: #fff; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 4px; margin-bottom: 16px; letter-spacing: 0.04em; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; margin-right: 16px; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13.5px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">
+    Claude Code 学習プロジェクト &nbsp;|&nbsp; <a href="../phase2/index.html">← Phase 2</a>
+  </div>
+</header>
+<div class="container">
+
+  <div class="phase-badge">Phase 3</div>
+  <h1>拡張機能 — Skills / Hooks / Subagents / Agent teams / Tools</h1>
+
+  <div class="source-note">
+    公式ドキュメント <a href="https://code.claude.com/docs/en/features-overview" target="_blank">features-overview</a> 他 7 ページを起点に生成した学習教材。各トピックに index.md（Markdown）と index.html（HTML）のペアあり。
+  </div>
+
+  <h2>Phase 3 の学習テーマ</h2>
+  <p>Claude Code の拡張機能を体系的に理解する。Skills（再利用可能なワークフロー）、Hooks（ライフサイクルイベント制御）、Subagents（専門 AI ワーカー）、Agent teams（複数セッション並列協調）、そして組み込みツールリファレンスをカバーする。</p>
+
+  <h2>トピック一覧</h2>
+  <div class="topic-grid">
+
+    <div class="topic-card">
+      <div class="num">01</div>
+      <div class="title"><a href="01-features-overview/index.html">拡張機能 概観</a></div>
+      <div class="desc">全拡張機能（Skills / Subagents / Agent teams / Hooks）の比較・選択フレームワーク。「どれを使うか」の判断基準を整理する。</div>
+      <div class="links">
+        <a href="01-features-overview/index.html">HTML版</a>
+        <a href="01-features-overview/index.md">Markdown版</a>
+      </div>
+    </div>
+
+    <div class="topic-card">
+      <div class="num">02</div>
+      <div class="title"><a href="02-skills-deep-dive/index.html">Skills 詳解</a></div>
+      <div class="desc">Skills のフロントマター全フィールド、スコープ・優先度、コマンド名の導出、ライブ変更検知、モノレポ対応、高度なパターン（context:fork / skillOverrides）まで。</div>
+      <div class="links">
+        <a href="02-skills-deep-dive/index.html">HTML版</a>
+        <a href="02-skills-deep-dive/index.md">Markdown版</a>
+      </div>
+    </div>
+
+    <div class="topic-card">
+      <div class="num">03</div>
+      <div class="title"><a href="03-hooks-fundamentals/index.html">Hooks 基礎</a></div>
+      <div class="desc">Hook ライフサイクル、28 の全イベント一覧、設定場所とスコープ、matcher パターン、handler フィールド（exec / shell 形式）。最初の Hook セットアップ手順つき。</div>
+      <div class="links">
+        <a href="03-hooks-fundamentals/index.html">HTML版</a>
+        <a href="03-hooks-fundamentals/index.md">Markdown版</a>
+      </div>
+    </div>
+
+    <div class="topic-card">
+      <div class="num">04</div>
+      <div class="title"><a href="04-hooks-io-and-patterns/index.html">Hooks I/O と実践パターン</a></div>
+      <div class="desc">JSON 入出力、exit code による決定制御、PreToolUse の permissionDecision、additionalContext / terminalSequence、HTTP Hook、実践パターン集、セキュリティ考慮事項。</div>
+      <div class="links">
+        <a href="04-hooks-io-and-patterns/index.html">HTML版</a>
+        <a href="04-hooks-io-and-patterns/index.md">Markdown版</a>
+      </div>
+    </div>
+
+    <div class="topic-card">
+      <div class="num">05</div>
+      <div class="title"><a href="05-subagents/index.html">カスタムサブエージェント</a></div>
+      <div class="desc">ビルトインサブエージェント（Explore / Plan / general-purpose）、フロントマター全フィールド、モデル解決順序、permissionMode、fork モード、persistent memory。</div>
+      <div class="links">
+        <a href="05-subagents/index.html">HTML版</a>
+        <a href="05-subagents/index.md">Markdown版</a>
+      </div>
+    </div>
+
+    <div class="topic-card">
+      <div class="num">06</div>
+      <div class="title"><a href="06-agent-teams/index.html">Agent Teams</a></div>
+      <div class="desc">複数 Claude Code セッションの並列協調（実験的機能）。アーキテクチャ（Team lead / Teammates / Task list / Mailbox）、有効化、表示モード、品質ゲートに使う Hook。</div>
+      <div class="links">
+        <a href="06-agent-teams/index.html">HTML版</a>
+        <a href="06-agent-teams/index.md">Markdown版</a>
+      </div>
+    </div>
+
+    <div class="topic-card">
+      <div class="num">07</div>
+      <div class="title"><a href="07-tools-reference/index.html">ツールリファレンス</a></div>
+      <div class="desc">全 ~30 組み込みツールの一覧・パーミッション要否・動作詳細（Bash 永続性、Edit の 3 チェック、Glob vs Grep の .gitignore 違い、WebFetch のロッシー変換など）。</div>
+      <div class="links">
+        <a href="07-tools-reference/index.html">HTML版</a>
+        <a href="07-tools-reference/index.md">Markdown版</a>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>公式 docs との対応</h2>
+  <table>
+    <thead><tr><th>トピック</th><th>参照した公式ページ</th></tr></thead>
+    <tbody>
+      <tr><td>01 概観</td><td><a href="https://code.claude.com/docs/en/features-overview" target="_blank">features-overview</a></td></tr>
+      <tr><td>02 Skills</td><td><a href="https://code.claude.com/docs/en/skills" target="_blank">skills</a></td></tr>
+      <tr><td>03 Hooks 基礎</td><td><a href="https://code.claude.com/docs/en/hooks-guide" target="_blank">hooks-guide</a> / <a href="https://code.claude.com/docs/en/hooks" target="_blank">hooks</a>（前半）</td></tr>
+      <tr><td>04 Hooks I/O</td><td><a href="https://code.claude.com/docs/en/hooks-guide" target="_blank">hooks-guide</a> / <a href="https://code.claude.com/docs/en/hooks" target="_blank">hooks</a>（後半）</td></tr>
+      <tr><td>05 Subagents</td><td><a href="https://code.claude.com/docs/en/sub-agents" target="_blank">sub-agents</a></td></tr>
+      <tr><td>06 Agent teams</td><td><a href="https://code.claude.com/docs/en/agent-teams" target="_blank">agent-teams</a></td></tr>
+      <tr><td>07 Tools</td><td><a href="https://code.claude.com/docs/en/tools-reference" target="_blank">tools-reference</a></td></tr>
+    </tbody>
+  </table>
+
+  <div class="footer-nav">
+    <a href="main.md">Markdown 目次（main.md）</a>
+    <a href="../phase2/index.html">← Phase 2</a>
+  </div>
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

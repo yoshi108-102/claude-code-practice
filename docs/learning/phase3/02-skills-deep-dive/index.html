@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills 詳解 — Phase 3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">← <a href="../index.html">Phase 3 トップ</a></div>
+</header>
+<div class="container">
+
+  <h1>Skills 詳解 — 再利用可能な知識とワークフロー</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/skills" target="_blank">Extend Claude with skills</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「skills」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>Skills は Claude の能力を拡張する。<code>SKILL.md</code> ファイルに指示を書くと、Claude のツールキットに追加される。Claude は関連する Skill を自動的に使うか、<code>/skill-name</code> で直接呼び出せる。CLAUDE.md が"いつも知っておくべきこと"なら、Skill は"必要なときだけ読み込む詳細コンテンツ"。Skill の本文はそれが使われるまでコンテキストを消費しない。</p>
+  <p>Custom commands と Skills は統合済み。<code>.claude/commands/deploy.md</code> と <code>.claude/skills/deploy/SKILL.md</code> は同じ <code>/deploy</code> を生成し、動作は同じ。Skills は追加機能（ディレクトリ構造・フロントマター・自動ロード）が使える。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>バンドル済み Skills</h3>
+  <table>
+    <thead><tr><th>Skill</th><th>目的</th></tr></thead>
+    <tbody>
+      <tr><td><code>/run</code></td><td>アプリを起動して変更が動作することを確認</td></tr>
+      <tr><td><code>/verify</code></td><td>コード変更をテスト/型チェックなしで確認</td></tr>
+      <tr><td><code>/run-skill-generator</code></td><td><code>/run</code> と <code>/verify</code> 向けにプロジェクト起動方法を記録</td></tr>
+      <tr><td><code>/code-review</code></td><td>コードレビュー</td></tr>
+      <tr><td><code>/batch</code></td><td>複数タスクの並列実行</td></tr>
+      <tr><td><code>/debug</code></td><td>デバッグ支援</td></tr>
+      <tr><td><code>/loop</code></td><td>繰り返しタスクのループ実行</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Skills の置き場所とスコープ</h3>
+  <table>
+    <thead><tr><th>場所</th><th>パス</th><th>適用範囲</th></tr></thead>
+    <tbody>
+      <tr><td>Enterprise (Managed)</td><td>managed settings 経由</td><td>組織の全ユーザー</td></tr>
+      <tr><td>Personal</td><td><code>~/.claude/skills/&lt;name&gt;/SKILL.md</code></td><td>全プロジェクト</td></tr>
+      <tr><td>Project</td><td><code>.claude/skills/&lt;name&gt;/SKILL.md</code></td><td>このプロジェクトのみ</td></tr>
+      <tr><td>Plugin</td><td><code>&lt;plugin&gt;/skills/&lt;name&gt;/SKILL.md</code></td><td>プラグインが有効な場所</td></tr>
+    </tbody>
+  </table>
+  <p>同名が複数スコープにある場合: enterprise &gt; personal &gt; project。Plugin Skills は <code>plugin-name:skill-name</code> の名前空間で区別されるため衝突しない。</p>
+
+  <h3>フロントマター リファレンス</h3>
+  <table>
+    <thead><tr><th>フィールド</th><th>必須</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td>No</td><td>表示名（コマンド名はディレクトリ名から取得）</td></tr>
+      <tr><td><code>description</code></td><td>推奨</td><td>用途。Claude がいつ使うかを判断。1,536文字上限</td></tr>
+      <tr><td><code>when_to_use</code></td><td>No</td><td>追加のトリガー条件。<code>description</code> に連結</td></tr>
+      <tr><td><code>argument-hint</code></td><td>No</td><td>オートコンプリート時のヒント</td></tr>
+      <tr><td><code>disable-model-invocation</code></td><td>No</td><td><code>true</code> にすると Claude が自動ロードしない</td></tr>
+      <tr><td><code>user-invocable</code></td><td>No</td><td><code>false</code> にすると <code>/</code> メニューから隠す</td></tr>
+      <tr><td><code>allowed-tools</code></td><td>No</td><td>Skill アクティブ中に承認なしで使えるツール</td></tr>
+      <tr><td><code>disallowed-tools</code></td><td>No</td><td>Skill アクティブ中に使えないツール（次のメッセージで解除）</td></tr>
+      <tr><td><code>model</code></td><td>No</td><td>この Skill 実行中のモデル（ターン中のみ有効）</td></tr>
+      <tr><td><code>context</code></td><td>No</td><td><code>fork</code> でサブエージェントとして実行</td></tr>
+      <tr><td><code>agent</code></td><td>No</td><td><code>context: fork</code> 時に使うサブエージェントタイプ</td></tr>
+      <tr><td><code>hooks</code></td><td>No</td><td>この Skill のライフサイクルフック</td></tr>
+      <tr><td><code>paths</code></td><td>No</td><td>マッチするファイルを操作するときだけ自動ロード</td></tr>
+    </tbody>
+  </table>
+
+  <h3>誰が呼び出すかを制御する</h3>
+  <table>
+    <thead><tr><th>フロントマター</th><th>ユーザーが呼べる</th><th>Claude が自動ロード</th><th>コンテキストへのロード</th></tr></thead>
+    <tbody>
+      <tr><td>（デフォルト）</td><td>Yes</td><td>Yes</td><td>説明は常時、本文は呼び出し時</td></tr>
+      <tr><td><code>disable-model-invocation: true</code></td><td>Yes</td><td>No</td><td>説明はなし、本文は呼び出し時</td></tr>
+      <tr><td><code>user-invocable: false</code></td><td>No</td><td>Yes</td><td>説明は常時、本文は呼び出し時</td></tr>
+    </tbody>
+  </table>
+
+  <h3>文字列置換</h3>
+  <table>
+    <thead><tr><th>変数</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td><code>$ARGUMENTS</code></td><td>呼び出し時に渡された全引数</td></tr>
+      <tr><td><code>$ARGUMENTS[N]</code></td><td>N 番目の引数（0-indexed）</td></tr>
+      <tr><td><code>$N</code></td><td><code>$ARGUMENTS[N]</code> の短縮形</td></tr>
+      <tr><td><code>${CLAUDE_SESSION_ID}</code></td><td>現在のセッション ID</td></tr>
+      <tr><td><code>${CLAUDE_EFFORT}</code></td><td>現在の努力レベル</td></tr>
+      <tr><td><code>${CLAUDE_SKILL_DIR}</code></td><td>SKILL.md があるディレクトリ（スクリプト参照に使用）</td></tr>
+    </tbody>
+  </table>
+
+  <h2>高度なパターン</h2>
+
+  <h3>ダイナミックコンテキストインジェクション</h3>
+  <p>`` !`&lt;command&gt;` `` 構文でシェルコマンドを実行し、出力を Skill 本文に埋め込む。Claude が受け取る前に実行される「前処理」として機能する:</p>
+  <pre><code>---
+name: pr-summary
+description: Summarize changes in a pull request
+context: fork
+agent: Explore
+allowed-tools: Bash(gh *)
+---
+
+## Pull request context
+- PR diff: !`gh pr diff`
+- PR comments: !`gh pr view --comments`
+- Changed files: !`gh pr diff --name-only`</code></pre>
+
+  <h3>サブエージェントとして実行する</h3>
+  <pre><code>---
+name: deep-research
+description: Research a topic thoroughly
+context: fork
+agent: Explore
+---
+
+Research $ARGUMENTS thoroughly:
+1. Find relevant files using Glob and Grep
+2. Read and analyze the code
+3. Summarize findings with specific file references</code></pre>
+
+  <h3>引数の渡し方</h3>
+  <pre><code>---
+name: migrate-component
+description: Migrate a component from one framework to another
+---
+
+Migrate the $0 component from $1 to $2.
+Preserve all existing behavior and tests.</code></pre>
+  <p><code>/migrate-component SearchBar React Vue</code> → <code>$0=SearchBar</code>, <code>$1=React</code>, <code>$2=Vue</code></p>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>Skills の本文は<strong>使われるまでコンテキストを消費しない</strong>。大きなリファレンスドキュメントを安心して入れられる</li>
+    <li><code>disable-model-invocation: true</code> は副作用のある Skill（デプロイ・コミット等）に必ず付ける</li>
+    <li>コマンド名はディレクトリ名から決まる（<code>name</code> フロントマターはあくまで表示名）</li>
+    <li><code>allowed-tools</code> は制限ではなく「事前承認」。他のツールも使える</li>
+    <li>Skill を <code>context: fork</code> で実行するとサブエージェントが使われ、メインコンテキストから隔離される</li>
+    <li><code>${CLAUDE_SKILL_DIR}</code> を使うとスクリプト参照がスコープに依存しなくなる</li>
+  </ul>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../03-hooks-fundamentals/index.html">03-hooks-fundamentals/</a> — Hooks の基礎（概念・イベント・設定）</li>
+  </ul>
+
+  <div class="footer-nav">← <a href="../main.md">Phase 3 Markdown 目次（main.md）</a></div>
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

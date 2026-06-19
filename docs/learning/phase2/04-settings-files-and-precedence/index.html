@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>settings.json の階層と優先順位 — Phase 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #fafafa;
+    }
+
+    .site-header {
+      border-bottom: 1px solid #e8e8e8;
+      padding: 12px 0;
+      background: #fff;
+    }
+    .site-header-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+      font-size: 13px;
+      color: #666;
+    }
+    .site-header-inner a {
+      color: #3d7fc1;
+      text-decoration: none;
+    }
+    .site-header-inner a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      background: #fff;
+      min-height: 100vh;
+    }
+
+    .source-note {
+      border-left: 3px solid #3d7fc1;
+      background: #f0f5fb;
+      padding: 10px 16px;
+      border-radius: 0 4px 4px 0;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 32px;
+    }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    .source-note a:hover { text-decoration: underline; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 20px;
+      line-height: 1.35;
+      border-bottom: 2px solid #3d7fc1;
+      padding-bottom: 12px;
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 40px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #ddd;
+    }
+    h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 28px 0 10px;
+    }
+    h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      margin: 20px 0 8px;
+    }
+
+    p { margin-bottom: 14px; }
+
+    strong { font-weight: 700; }
+    em { font-style: italic; }
+
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    ul, ol {
+      margin: 0 0 14px 24px;
+    }
+    li { margin-bottom: 4px; }
+
+    blockquote {
+      border-left: 3px solid #3d7fc1;
+      background: #f6faff;
+      padding: 10px 16px;
+      border-radius: 0 4px 4px 0;
+      color: #444;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th {
+      background: #f0f4f8;
+      color: #333;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid #dde3ea;
+    }
+    td {
+      padding: 8px 12px;
+      border: 1px solid #dde3ea;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #fafbfc; }
+
+    pre {
+      background: #f4f4f4;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    code {
+      font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace;
+    }
+    p code, li code, td code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 13px;
+    }
+
+    .footer-nav {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #e8e8e8;
+      font-size: 13px;
+      color: #666;
+    }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .footer-nav a:hover { text-decoration: underline; }
+
+    .auto-generated {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #aaa;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    ← <a href="../index.html">Phase 2 トップ</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>settings.json の階層と優先順位</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/settings" target="_blank">Claude Code settings</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「Claude Code settings」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p><code>settings.json</code> は Claude Code の挙動を設定するファイル。CLAUDE.md が「振る舞いのガイド（強制ではない）」であるのに対し、settings は <strong>permission・env・model など技術的な設定（強制レイヤー寄り）</strong> を担う。設定には <strong>4 つのスコープ</strong> があり、それぞれ「誰に効くか」「チームと共有するか」が異なる。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>4 つのスコープと保管場所</h3>
+
+  <table>
+    <thead>
+      <tr><th>スコープ</th><th>場所</th><th>効く範囲</th><th>git 共有</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Managed</strong></td>
+        <td>macOS: <code>/Library/Application Support/ClaudeCode/</code> / Linux: <code>/etc/claude-code/</code> / Windows: レジストリ or <code>C:\Program Files\ClaudeCode\</code></td>
+        <td>マシン上の全ユーザー</td>
+        <td>IT が MDM/plist/registry で配布</td>
+      </tr>
+      <tr>
+        <td><strong>User</strong></td>
+        <td><code>~/.claude/settings.json</code></td>
+        <td>自分の全プロジェクト</td>
+        <td>×</td>
+      </tr>
+      <tr>
+        <td><strong>Project</strong></td>
+        <td><code>.claude/settings.json</code></td>
+        <td>リポジトリの全員</td>
+        <td>○（commit）</td>
+      </tr>
+      <tr>
+        <td><strong>Local</strong></td>
+        <td><code>.claude/settings.local.json</code></td>
+        <td>自分・このリポのみ</td>
+        <td>×（<code>.gitignore</code> 推奨）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>別枠として <code>~/.claude.json</code> があり、OAuth セッション・MCP 設定・プロジェクト状態・キャッシュが入る。また <code>.mcp.json</code> はプロジェクト別 MCP 設定ファイル。</p>
+
+  <h4>Managed 設定の配布方法</h4>
+  <p>組織管理者は以下の 3 経路で managed settings を配布できる:</p>
+  <ol>
+    <li><strong>MDM/OS ポリシー</strong>（macOS は plist/Jamf、Windows はレジストリ/Group Policy）</li>
+    <li><strong>ファイルベース配布</strong>（上記のパスに <code>managed-settings.json</code> を設置）</li>
+    <li><strong>Drop-in ディレクトリ</strong>（<code>managed-settings.d/*.json</code> をアルファベット順でマージ）</li>
+  </ol>
+
+  <h3>優先順位（precedence）</h3>
+  <p>同じ設定キーが複数スコープにある場合、<strong>上位が下位を上書き</strong>:</p>
+  <pre><code>1. Managed（最強・CLI 引数でも覆せない）
+2. CLI 引数（--model 等。一時的なセッション上書き）
+3. Local（.claude/settings.local.json）
+4. Project（.claude/settings.json）
+5. User（~/.claude/settings.json）</code></pre>
+
+  <blockquote>
+    <strong>重要な例外</strong>: permission ルール（allow/ask/deny）は「上書き」ではなく<strong>全スコープでマージ</strong>される。deny は最優先で適用されるため、「どこかで deny されたら他のどのレベルでも allow できない」。
+  </blockquote>
+
+  <h3>主要な設定キー（カテゴリ別）</h3>
+
+  <h4>モデル・AI 動作</h4>
+  <table>
+    <thead><tr><th>キー</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>model</code></td><td>デフォルトモデル（alias または full model name）</td></tr>
+      <tr><td><code>availableModels</code></td><td>ユーザーが選択できるモデルの制限（managed 推奨）</td></tr>
+      <tr><td><code>fallbackModel</code></td><td>過負荷時のフォールバックモデル列</td></tr>
+      <tr><td><code>effortLevel</code></td><td>努力レベルを永続化（<code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code>）</td></tr>
+      <tr><td><code>alwaysThinkingEnabled</code></td><td>拡張思考をデフォルト有効</td></tr>
+    </tbody>
+  </table>
+
+  <h4>パーミッション・セキュリティ</h4>
+  <table>
+    <thead><tr><th>キー</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>permissions.allow/ask/deny</code></td><td>権限ルール（→ トピック 05）</td></tr>
+      <tr><td><code>permissions.defaultMode</code></td><td>起動時の permission モード（→ トピック 06）</td></tr>
+      <tr><td><code>allowManagedPermissionRulesOnly</code></td><td>user/project の権限ルールを無効化（managed のみ）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>MCP サーバー</h4>
+  <table>
+    <thead><tr><th>キー</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>allowedMcpServers</code></td><td>MCP サーバーのホワイトリスト（managed のみ）</td></tr>
+      <tr><td><code>deniedMcpServers</code></td><td>MCP サーバーのブラックリスト</td></tr>
+      <tr><td><code>allowManagedMcpServersOnly</code></td><td>managed 定義の MCP のみ許可</td></tr>
+    </tbody>
+  </table>
+
+  <h4>メモリ・CLAUDE.md</h4>
+  <table>
+    <thead><tr><th>キー</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>autoMemoryEnabled</code></td><td>auto memory の ON/OFF（Phase 2 Task 1）</td></tr>
+      <tr><td><code>claudeMd</code></td><td>組織管理の CLAUDE.md 内容（managed 限定）</td></tr>
+      <tr><td><code>claudeMdExcludes</code></td><td>除外する CLAUDE.md パターン</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Hooks・拡張</h4>
+  <table>
+    <thead><tr><th>キー</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>hooks</code></td><td>ライフサイクルイベントでのコマンド（Phase 3）</td></tr>
+      <tr><td><code>allowManagedHooksOnly</code></td><td>managed 定義のフックのみ許可</td></tr>
+    </tbody>
+  </table>
+
+  <h4>環境変数</h4>
+  <table>
+    <thead><tr><th>キー</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>env</code></td><td>全セッションに適用する環境変数（→ トピック 07）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>UI・スタイル</h4>
+  <table>
+    <thead><tr><th>キー</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>language</code></td><td>応答言語・音声入力言語</td></tr>
+      <tr><td><code>outputStyle</code></td><td>システムプロンプト調整</td></tr>
+      <tr><td><code>editorMode</code></td><td>キーバインド（<code>normal</code>/<code>vim</code>）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>設定変更の反映タイミング</h3>
+  <p><strong>リアルタイム反映</strong>（セッション再開不要）: <code>permissions</code>、<code>hooks</code>、credential helpers</p>
+  <p><strong>セッション再開 or 別操作が必要</strong>:</p>
+  <ul>
+    <li><code>model</code> → <code>/model</code> コマンドで途中切替可能</li>
+    <li><code>outputStyle</code> → <code>/clear</code> で再構築</li>
+  </ul>
+
+  <h3>無効エントリの処理（Managed 設定）</h3>
+  <p>managed settings に無効な値が入っても、Claude Code は無効エントリをスキップして警告を記録し、残りの有効なポリシーを継続する。ただし <code>allowedMcpServers</code> のようなセキュリティ系フィールドは例外処理が厳しく、無効時は空のホワイトリスト（= MCP 不許可）として機能する。</p>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>settings は 4 スコープ（managed &gt; CLI &gt; local &gt; project &gt; user）。<strong>managed は何があっても覆せない</strong></li>
+    <li>CLAUDE.md が「ガイド」なら settings は「<strong>技術的設定・強制寄り</strong>」—役割分担を意識</li>
+    <li><strong>permission ルールだけは上書きでなくマージ</strong>。deny は全スコープ最優先 → 「どこかで deny したら誰も allow できない」</li>
+    <li><code>settings.local.json</code> は個人用 → <code>.gitignore</code> に追加（Phase 2 Task 1 で実施済み）</li>
+    <li>managed-only のキー（<code>claudeMd</code>、<code>allowedMcpServers</code>、<code>allowManagedPermissionRulesOnly</code> 等）は user/project に書いても無効</li>
+    <li><code>managed-settings.d/</code> によるドロップイン配布で複数チームが独立してポリシーを追加できる</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>最小の settings.json</h3>
+  <pre><code>{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": ["Bash(npm run test *)", "Read(~/.zshrc)"],
+    "deny":  ["Bash(curl *)", "Read(./.env)", "Read(./secrets/**)"]
+  },
+  "env": { "CLAUDE_CODE_ENABLE_TELEMETRY": "1" },
+  "model": "claude-sonnet-4-6",
+  "autoMemoryEnabled": true
+}</code></pre>
+  <p><code>$schema</code> を書くと VS Code/Cursor でオートコンプリートとインライン検証が有効になる。</p>
+
+  <h3>「user で許可、project で拒否」→ どちらが勝つ?</h3>
+  <pre><code>user settings:    allow: Bash(git push *)
+project settings: deny:  Bash(git push *)
+→ deny が勝つ（permission はマージ + deny 最優先）</code></pre>
+
+  <h3>managed settings の Drop-in 配布例</h3>
+  <pre><code>managed-settings.d/
+├── 10-telemetry.json      # 先に適用
+├── 20-security.json       # 後に適用（スカラーは上書き、配列はマージ+重複排除）
+└── 30-policies.json</code></pre>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../05-permissions/index.html">05-permissions/</a> — 権限ルール（allow/ask/deny）の詳細</li>
+  </ul>
+
+  <div class="footer-nav">
+    ← <a href="../main.md">Phase 2 Markdown 目次（main.md）</a>
+  </div>
+
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

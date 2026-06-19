@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>カスタムサブエージェント — Phase 3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">← <a href="../index.html">Phase 3 トップ</a></div>
+</header>
+<div class="container">
+
+  <h1>カスタムサブエージェント — 設定と活用</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/sub-agents" target="_blank">Create custom subagents</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「sub-agents」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>サブエージェントは特定タスクを担う専門 AI アシスタント。サイドタスクが検索結果・ログ・ファイル内容で会話を埋めてしまう場合、サブエージェントは独自コンテキストでそれを処理し、サマリーだけを返す。同じ種類のワーカーを繰り返しスポーンしているなら、カスタムサブエージェントを定義する価値がある。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>ビルトインサブエージェント</h3>
+  <table>
+    <thead><tr><th>エージェント</th><th>モデル</th><th>ツール</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Explore</strong></td><td>Haiku（高速）</td><td>読み取り専用</td><td>ファイル発見・コード検索・コードベース探索</td></tr>
+      <tr><td><strong>Plan</strong></td><td>親会話を継承</td><td>読み取り専用</td><td>Plan モード中のコードベース調査</td></tr>
+      <tr><td><strong>general-purpose</strong></td><td>親会話を継承</td><td>全ツール</td><td>複雑な調査・マルチステップ操作・コード修正</td></tr>
+    </tbody>
+  </table>
+
+  <h3>スコープと優先度</h3>
+  <table>
+    <thead><tr><th>場所</th><th>スコープ</th><th>優先度</th></tr></thead>
+    <tbody>
+      <tr><td>Managed settings</td><td>組織全体</td><td>1（最高）</td></tr>
+      <tr><td><code>--agents</code> CLI フラグ</td><td>現在のセッション</td><td>2</td></tr>
+      <tr><td><code>.claude/agents/</code></td><td>このプロジェクト</td><td>3</td></tr>
+      <tr><td><code>~/.claude/agents/</code></td><td>全プロジェクト</td><td>4</td></tr>
+      <tr><td>Plugin の <code>agents/</code></td><td>プラグインが有効な場所</td><td>5（最低）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>フロントマターフィールド（主要）</h3>
+  <table>
+    <thead><tr><th>フィールド</th><th>必須</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td>Yes</td><td>小文字・ハイフン使用の一意識別子</td></tr>
+      <tr><td><code>description</code></td><td>Yes</td><td>Claude がいつ委任するかを判断するための説明</td></tr>
+      <tr><td><code>tools</code></td><td>No</td><td>使えるツールのリスト（省略で全ツールを継承）</td></tr>
+      <tr><td><code>disallowedTools</code></td><td>No</td><td>拒否するツール</td></tr>
+      <tr><td><code>model</code></td><td>No</td><td><code>sonnet</code>/<code>opus</code>/<code>haiku</code>/<code>fable</code>/<code>inherit</code></td></tr>
+      <tr><td><code>permissionMode</code></td><td>No</td><td><code>default</code>/<code>acceptEdits</code>/<code>auto</code>/<code>dontAsk</code>/<code>bypassPermissions</code>/<code>plan</code></td></tr>
+      <tr><td><code>maxTurns</code></td><td>No</td><td>最大ターン数</td></tr>
+      <tr><td><code>skills</code></td><td>No</td><td>起動時にプリロードする Skills</td></tr>
+      <tr><td><code>memory</code></td><td>No</td><td>永続メモリスコープ: <code>user</code>/<code>project</code>/<code>local</code></td></tr>
+      <tr><td><code>background</code></td><td>No</td><td><code>true</code> で常にバックグラウンド実行</td></tr>
+      <tr><td><code>isolation</code></td><td>No</td><td><code>worktree</code> で一時 git worktree で実行</td></tr>
+    </tbody>
+  </table>
+
+  <h3>起動時のロード内容</h3>
+  <table>
+    <thead><tr><th>コンテンツ</th><th>ロードされるか</th></tr></thead>
+    <tbody>
+      <tr><td>エージェント自身のシステムプロンプト</td><td>Yes（常に）</td></tr>
+      <tr><td>タスクメッセージ（Claude が書く委任プロンプト）</td><td>Yes</td></tr>
+      <tr><td>CLAUDE.md / メモリ階層</td><td>Yes（Explore と Plan を除く）</td></tr>
+      <tr><td>git status</td><td>Yes（Explore と Plan を除く）</td></tr>
+      <tr><td>プリロード Skills（<code>skills</code> フィールド）</td><td>Yes（列挙されたもの）</td></tr>
+      <tr><td>親会話のコンテキスト</td><td>No（fork の場合のみ Yes）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Fork vs Named subagent</h3>
+  <table>
+    <thead><tr><th></th><th>Fork</th><th>Named subagent</th></tr></thead>
+    <tbody>
+      <tr><td><strong>コンテキスト</strong></td><td>全会話履歴を継承</td><td>新鮮なコンテキスト</td></tr>
+      <tr><td><strong>システムプロンプト</strong></td><td>メインセッションと同じ</td><td>定義ファイルから</td></tr>
+      <tr><td><strong>プロンプトキャッシュ</strong></td><td>親と共有（コスト低）</td><td>独立キャッシュ</td></tr>
+    </tbody>
+  </table>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>サブエージェントを使う主な目的は<strong>コンテキスト隔離</strong>。詳細はサブエージェントで処理し、サマリーだけを受け取る</li>
+    <li><code>description</code> フィールドが Claude の委任判断に使われる。積極的な委任を促す文言（"use proactively"）が有効</li>
+    <li>サブエージェントは他のサブエージェントをスポーンできない（ネスト不可）</li>
+    <li><code>memory</code> フィールドで会話をまたいだ知識の蓄積が可能。<code>project</code> スコープが推奨</li>
+    <li>Fork はコンテキストを引き継ぐため、背景説明が多い場合に有効。プロンプトキャッシュも共有できる</li>
+    <li><code>isolation: worktree</code> でサブエージェントが分離された git worktree で実行される</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>コードレビュー専門サブエージェント</h3>
+  <pre><code>---
+name: code-reviewer
+description: Expert code review specialist. Use immediately after writing or modifying code.
+tools: Read, Grep, Glob, Bash
+model: inherit
+---
+
+You are a senior code reviewer ensuring high standards.
+
+When invoked:
+1. Run git diff to see recent changes
+2. Focus on modified files
+
+Review checklist:
+- Code clarity and readability
+- Error handling
+- No exposed secrets
+- Test coverage</code></pre>
+
+  <h3>永続メモリを持つサブエージェント</h3>
+  <pre><code>---
+name: code-reviewer
+description: Reviews code for quality and best practices
+memory: user
+---
+
+Update your agent memory as you discover patterns, conventions, and recurring issues.
+This builds institutional knowledge across conversations.</code></pre>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../06-agent-teams/index.html">06-agent-teams/</a> — Agent teams による並列協調</li>
+  </ul>
+
+  <div class="footer-nav">← <a href="../main.md">Phase 3 Markdown 目次（main.md）</a></div>
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

@@ -1,3 +1,4 @@
+<!-- DEPRECATED: 新版は ../07-env-vars-and-model-config/index.md（HTML 版は index.html）-->
 # 04. 環境変数とモデル設定
 
 > 出典:

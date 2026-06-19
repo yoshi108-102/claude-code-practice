@@ -1,3 +1,4 @@
+<!-- DEPRECATED: 新版は ../05-permissions/index.md（HTML 版は index.html）-->
 # 02. 権限ルール — allow / ask / deny
 
 > 出典: [Configure permissions](https://code.claude.com/docs/en/permissions)（閲覧日 2026-05-22）

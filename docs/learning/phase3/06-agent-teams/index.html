@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Teams — Phase 3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    blockquote { border-left: 3px solid #e0a000; background: #fffbf0; padding: 10px 16px; border-radius: 0 4px 4px 0; color: #555; margin: 16px 0; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">← <a href="../index.html">Phase 3 トップ</a></div>
+</header>
+<div class="container">
+
+  <h1>Agent Teams — 複数セッションの並列協調</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/agent-teams" target="_blank">Orchestrate teams of Claude Code sessions</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「agent-teams」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>Agent teams は複数の Claude Code インスタンスを協調して動かす仕組み。1 つのセッションがチームリードとして機能し、チームメイトは独立して作業しながら互いに直接メッセージを送り合える。</p>
+
+  <blockquote>
+    <strong>注意</strong>: 実験的機能でデフォルト無効。<code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code> で有効化する。Claude Code v2.1.32 以降が必要。
+  </blockquote>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>サブエージェントとの比較</h3>
+  <table>
+    <thead><tr><th></th><th>Subagents</th><th>Agent teams</th></tr></thead>
+    <tbody>
+      <tr><td><strong>通信</strong></td><td>親エージェントにのみ結果を返す</td><td>チームメイト同士が直接メッセージ</td></tr>
+      <tr><td><strong>協調</strong></td><td>親が全ての仕事を管理</td><td>共有タスクリストで自律調整</td></tr>
+      <tr><td><strong>トークンコスト</strong></td><td>低（サマリーとして返す）</td><td>高（各メンバーが独立した Claude インスタンス）</td></tr>
+      <tr><td><strong>最適な用途</strong></td><td>結果だけが重要な集中タスク</td><td>議論・協調が必要な複雑な作業</td></tr>
+    </tbody>
+  </table>
+
+  <h3>アーキテクチャ</h3>
+  <table>
+    <thead><tr><th>コンポーネント</th><th>役割</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Team lead</strong></td><td>チームを作成し、チームメイトをスポーン・調整するメインセッション</td></tr>
+      <tr><td><strong>Teammates</strong></td><td>割り当てられたタスクをこなす独立した Claude Code インスタンス</td></tr>
+      <tr><td><strong>Task list</strong></td><td>チームメイトがクレームして完了する共有タスクリスト</td></tr>
+      <tr><td><strong>Mailbox</strong></td><td>エージェント間通信メッセージングシステム</td></tr>
+    </tbody>
+  </table>
+
+  <h3>有効化</h3>
+  <pre><code>{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}</code></pre>
+
+  <h3>Hooks でクオリティゲートを実施</h3>
+  <table>
+    <thead><tr><th>Hook</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>TeammateIdle</code></td><td>チームメイトがアイドルになる時。exit 2 でフィードバックを送り作業継続</td></tr>
+      <tr><td><code>TaskCreated</code></td><td>タスク作成時。exit 2 で作成を防いでフィードバック</td></tr>
+      <tr><td><code>TaskCompleted</code></td><td>タスク完了時。exit 2 で完了を防いでフィードバック</td></tr>
+    </tbody>
+  </table>
+
+  <h3>既知の制限事項</h3>
+  <ul>
+    <li><code>/resume</code> と <code>/rewind</code> は in-process チームメイトを復元しない</li>
+    <li>タスクステータスのラグが起きることがある（タスクが stuck に見える場合は手動確認）</li>
+    <li>シャットダウンが遅い場合がある（現在のリクエストを完了するまで待つ）</li>
+    <li>一度に 1 チームのみ管理可能</li>
+    <li>チームメイトは独自のチームやチームメイトをスポーンできない（ネスト不可）</li>
+    <li>Split panes は VS Code 統合ターミナル・Windows Terminal・Ghostty では未対応</li>
+  </ul>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>Agent teams は実験的機能。<code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code> で有効化が必要</li>
+    <li>チームメイト同士が直接メッセージを送れる点がサブエージェントとの本質的な違い</li>
+    <li>トークン消費が大幅に増える。並列探索が真に価値を持つ場合（研究・レビュー・新機能）に使う</li>
+    <li>クリーンアップは必ずリードから実行する</li>
+    <li>3〜5 人のチームサイズ、チームメイト 1 人あたり 5〜6 タスクが多くのワークフローで最適</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>並列コードレビューの例</h3>
+  <pre><code>Create an agent team to review PR #142. Spawn three reviewers:
+- One focused on security implications
+- One checking performance impact
+- One validating test coverage
+Have them each review and report findings.</code></pre>
+
+  <h3>競合仮説によるデバッグ</h3>
+  <pre><code>Users report the app exits after one message.
+Spawn 5 agent teammates to investigate different hypotheses.
+Have them talk to each other to try to disprove each other's theories,
+like a scientific debate. Update the findings doc with whatever consensus emerges.</code></pre>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../07-tools-reference/index.html">07-tools-reference/</a> — 組み込みツールのリファレンス</li>
+  </ul>
+
+  <div class="footer-nav">← <a href="../main.md">Phase 3 Markdown 目次（main.md）</a></div>
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

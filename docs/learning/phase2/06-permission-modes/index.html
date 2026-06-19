@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permission モード — 6 つの動作モード — Phase 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    .source-note a:hover { text-decoration: underline; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    blockquote { border-left: 3px solid #3d7fc1; background: #f6faff; padding: 10px 16px; border-radius: 0 4px 4px 0; color: #444; margin: 16px 0; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .footer-nav a:hover { text-decoration: underline; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    ← <a href="../index.html">Phase 2 トップ</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>Permission モード — 6 つの動作モード</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/permission-modes" target="_blank">Choose a permission mode</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「Choose a permission mode」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>permission ルール（トピック 05）が「個別の許可/禁止」なら、permission モードは「<strong>そのセッション全体で、どれくらい確認を挟むかのベースライン</strong>」。ルールはモードの上に重ねる。モードを選ぶことで、細かいレビューを都度行うか、長時間タスクを邪魔なく回すかを制御できる。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>6 つのモード一覧</h3>
+  <table>
+    <thead><tr><th>モード</th><th>確認なしで動くもの</th><th>向き</th></tr></thead>
+    <tbody>
+      <tr><td><code>default</code></td><td>読み取りのみ</td><td>開始時・慎重な作業</td></tr>
+      <tr><td><code>acceptEdits</code></td><td>読み取り + ファイル編集 + 一般的な FS コマンド（mkdir/touch/mv/cp/rm/sed）</td><td>レビュー前提で実装を回す</td></tr>
+      <tr><td><code>plan</code></td><td>読み取りのみ（編集しない・計画を出す）</td><td>変更前のコードベース調査</td></tr>
+      <tr><td><code>auto</code></td><td>ほぼ全部（<strong>背後で classifier が安全チェック</strong>）</td><td>長時間タスク・プロンプト疲れ軽減</td></tr>
+      <tr><td><code>dontAsk</code></td><td>事前承認済みツールのみ（それ以外は自動 deny）</td><td>CI・ロックダウン環境</td></tr>
+      <tr><td><code>bypassPermissions</code></td><td>全部（<code>rm -rf /</code> や <code>rm -rf ~</code> は例外的に確認）</td><td>隔離コンテナ/VM のみ</td></tr>
+    </tbody>
+  </table>
+
+  <blockquote>
+    <strong><code>bypassPermissions</code> 以外の全モードで、protected paths への書き込みは自動承認されない</strong>（後述）。
+  </blockquote>
+
+  <h3>モードの切り替え方法</h3>
+  <ul>
+    <li><strong><code>Shift+Tab</code></strong> で循環: <code>default → acceptEdits → plan</code>（3 つのみ）</li>
+    <li><strong>起動時</strong>: <code>claude --permission-mode plan</code></li>
+    <li><strong>デフォルト</strong>: settings の <code>permissions.defaultMode</code></li>
+    <li><code>auto</code> / <code>dontAsk</code> / <code>bypassPermissions</code> は通常の循環に出ない（opt-in や専用フラグが必要）</li>
+  </ul>
+  <p>VS Code では画面下部のモードインジケーターから切り替え可能。Desktop でも専用セレクターがある。</p>
+
+  <h3>acceptEdits モード</h3>
+  <p><code>acceptEdits</code> モードでは作業ディレクトリ内のファイル作成・編集が確認なしで実行される。追加で自動承認される Bash コマンド: <code>mkdir</code>/<code>touch</code>/<code>rm</code>/<code>rmdir</code>/<code>mv</code>/<code>cp</code>/<code>sed</code>（作業ディレクトリ内のパスのみ）。</p>
+  <p><code>git diff</code> やエディタで事後レビューする開発スタイルに向く。<code>Shift+Tab</code> 1 回で入れる。</p>
+
+  <h3>plan モード</h3>
+  <p>plan モードでは Claude は<strong>読む・調べる・計画を書く</strong>が<strong>ソースを編集しない</strong>。permission プロンプトは <code>default</code> と同じ。</p>
+  <p>計画提示後の選択肢:</p>
+  <ul>
+    <li>Auto で開始</li>
+    <li>acceptEdits で承認（各編集を手動レビュー）</li>
+    <li>計画を続ける / フィードバックを与える</li>
+    <li>Ultraplan でブラウザベースのレビューに移行</li>
+  </ul>
+  <p>承認するとモードが切り替わって編集開始。<code>Shift+Tab</code> か <code>/plan</code> で入る。<code>Ctrl+G</code> で提案プランをエディタで直接編集してから承認できる。</p>
+
+  <h3>auto モード（要件あり）</h3>
+  <p>auto モードは別の <strong>classifier モデル</strong> が各アクションを実行前にレビューし、「リクエストを逸脱する/未知のインフラを触る/敵対的コンテンツ由来」のものをブロック。</p>
+
+  <h4>利用要件</h4>
+  <ul>
+    <li>Claude Code v2.1.83+</li>
+    <li>モデル: Anthropic API では Opus 4.6 以降 or Sonnet 4.6。Bedrock/Vertex AI/Foundry では Opus 4.7 以降のみ</li>
+    <li>Anthropic API ではデフォルト有効。Bedrock/Vertex/Foundry では <code>CLAUDE_CODE_ENABLE_AUTO_MODE=1</code> が必要（v2.1.158+）</li>
+    <li>Team/Enterprise では管理者の有効化が必要</li>
+  </ul>
+
+  <h4>classifier がデフォルトでブロックするもの</h4>
+  <ul>
+    <li><code>curl | bash</code> などのダウンロード+実行</li>
+    <li>機密データの外部エンドポイントへの送信</li>
+    <li>本番デプロイ/マイグレーション</li>
+    <li>クラウドストレージの大量削除</li>
+    <li>IAM 付与、shared インフラへの変更</li>
+    <li>セッション開始前から存在したファイルの不可逆削除</li>
+    <li>force push、main への直接 push</li>
+  </ul>
+
+  <h4>デフォルトで許可するもの</h4>
+  <ul>
+    <li>作業ディレクトリ内のローカルファイル操作</li>
+    <li>lock ファイル/マニフェスト記載の依存インストール</li>
+    <li><code>.env</code> を読んで対応する API に送信</li>
+    <li>read-only HTTP リクエスト</li>
+    <li>開始ブランチ、または Claude が作成したブランチへの push</li>
+  </ul>
+
+  <h4>会話で述べた境界</h4>
+  <p>「push するな」のように会話で述べた境界を classifier が尊重する。ただし <strong>context compaction で境界メッセージが消えると失われる</strong> → 確実に守りたいなら deny ルールを使う。</p>
+
+  <h4>フォールバック</h4>
+  <p>3 連続 or 累計 20 回ブロックでプロンプトに戻る（<code>-p</code> 非対話では abort）。<code>/permissions</code> の「Recently denied」タブから <code>r</code> でリトライできる。</p>
+
+  <h4>auto モード中の広すぎる allow ルールの自動無効化</h4>
+  <p><code>Bash(*)</code> や <code>Bash(python*)</code> 等の広すぎる allow ルールは auto モード中一時的に無効化される。<code>Bash(npm test)</code> のような狭いルールは有効のまま。auto を抜けると復元。</p>
+
+  <h3>dontAsk モード</h3>
+  <p>プロンプトが必要な全呼び出しを<strong>自動 deny</strong>。<code>permissions.allow</code> 記載と read-only Bash だけ実行。<code>ask</code> ルールも deny 扱いになる。<strong>CI で「事前定義したことだけやらせる」</strong>用途。<code>claude --permission-mode dontAsk</code> で起動。</p>
+
+  <h3>bypassPermissions モード</h3>
+  <p>全プロンプト・安全チェックをスキップ。<code>rm -rf /</code> や <code>rm -rf ~</code> だけはサーキットブレーカーで確認。<strong>隔離コンテナ/VM 専用</strong>。</p>
+  <ul>
+    <li>root/sudo では起動拒否（recognized sandbox 内は自動スキップ）</li>
+    <li><strong>prompt injection への保護はゼロ</strong> → 「プロンプトなし + 安全」なら auto を使え</li>
+    <li><code>--permission-mode bypassPermissions</code> または <code>--dangerously-skip-permissions</code> で起動</li>
+    <li>一度 bypass なしで起動したセッションから bypass には入れない（再起動が必要）</li>
+    <li><code>disableBypassPermissionsMode: "disable"</code> で組織封印（managed settings）</li>
+  </ul>
+
+  <h3>protected paths（全モード共通の最後の砦）</h3>
+  <p><code>bypassPermissions</code> 以外の全モードで、以下への書き込みは<strong>自動承認されない</strong>:</p>
+  <table>
+    <thead><tr><th>モード</th><th>保護パスへの書き込み</th></tr></thead>
+    <tbody>
+      <tr><td><code>default</code> / <code>acceptEdits</code> / <code>plan</code></td><td>プロンプト</td></tr>
+      <tr><td><code>auto</code></td><td>classifier に送る</td></tr>
+      <tr><td><code>dontAsk</code></td><td>自動 deny</td></tr>
+      <tr><td><code>bypassPermissions</code></td><td>許可</td></tr>
+    </tbody>
+  </table>
+  <p>保護ディレクトリ例: <code>.git</code>/<code>.vscode</code>/<code>.idea</code>/<code>.husky</code>/<code>.cargo</code>/<code>.devcontainer</code>/<code>.yarn</code>/<code>.mvn</code>/<code>.claude</code>（ただし <code>.claude/worktrees</code> は除く）</p>
+  <p>保護ファイル例: <code>.gitconfig</code>/<code>.gitmodules</code>/<code>.bashrc</code>/<code>.zshrc</code>/<code>.mcp.json</code>/<code>.claude.json</code> など多数</p>
+  <blockquote>
+    <code>allow</code> ルールを settings に書いても protected paths は事前承認されない（安全チェックが allow ルールより先に走るため）。
+  </blockquote>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>モードは「セッション全体の確認頻度のベースライン」。その上に permission ルールを重ねる</li>
+    <li><code>Shift+Tab</code> 循環は <code>default → acceptEdits → plan</code> の 3 つのみ。auto/dontAsk/bypass は別途</li>
+    <li><strong>auto = 別 classifier の二重チェック</strong>（野放しではない）。Anthropic API 限定・モデル要件あり</li>
+    <li><strong>会話で述べた境界は compaction で消えうる</strong> → 確実にしたいなら deny ルール</li>
+    <li><code>bypassPermissions</code> は prompt injection 無防備 → 隔離環境専用。「プロンプトなし + 安全」なら auto</li>
+    <li><strong>protected paths</strong>（<code>.git</code>/<code>.claude</code> 等）は bypass 以外で自動承認されない最後の砦</li>
+    <li>managed の <code>disableBypassPermissionsMode</code> / <code>disableAutoMode</code> で危険モードを組織封印</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>モードと「確認なしで動く範囲」</h3>
+  <pre><code>default            読むだけ
+acceptEdits        読む + 編集 + mkdir/mv/cp/rm（作業ディレクトリ内）
+plan               読むだけ（編集禁止・計画を出す）
+auto               ほぼ全部（classifier が逸脱をブロック）
+dontAsk            allow 済みのみ（他は自動 deny）
+bypassPermissions  全部（rm -rf / ~ だけ確認）</code></pre>
+
+  <h3>plan → 実行 の安全な動線</h3>
+  <pre><code>Shift+Tab で plan モード入場
+  → Claude が調べて計画を出す
+  → 承認 → acceptEdits/auto でモード切替 → 編集開始</code></pre>
+
+  <h3>defaultMode を settings に永続化</h3>
+  <pre><code>{
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  }
+}</code></pre>
+  <p><code>defaultMode: "auto"</code> は <code>~/.claude/settings.json</code>（ユーザー設定）にのみ有効。project/local settings に書くと無視される（v2.1.142+）。</p>
+
+  <h3>Bedrock/Vertex で auto モードを有効化</h3>
+  <pre><code>{
+  "env": {
+    "CLAUDE_CODE_ENABLE_AUTO_MODE": "1"
+  }
+}</code></pre>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>次のトピック</h2>
+  <ul>
+    <li><a href="../07-env-vars-and-model-config/index.html">07-env-vars-and-model-config/</a> — 環境変数とモデル設定</li>
+  </ul>
+
+  <div class="footer-nav">
+    ← <a href="../main.md">Phase 2 Markdown 目次（main.md）</a>
+  </div>
+
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

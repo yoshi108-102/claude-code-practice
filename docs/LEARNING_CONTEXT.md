@@ -11,8 +11,8 @@ Claude Code の学習が主目的。公式 docs/reference（全114ページ）�
 | Phase | テーマ | 新規概念（主要） | 担当 docs ページ数 | 状態 |
 |---|---|---|---|---|
 | 1 | 基礎 — Claude Code の世界観を掴む | agentic loop / CLI基本 / 各Surface (CLI/VS Code/Desktop/Web/JetBrains/Chrome) / context window / checkpointing | 32 | ⏸ 保留 (Task 3/8 で中断、後回し) |
-| 2 | カスタマイズ — 記憶・設定・権限 | CLAUDE.md / auto memory / settings.json / permissions / output styles / statusline / sandboxing | 12 | 🚧 進行中 (Task 2) |
-| 3 | 拡張機能 — Skills / Hooks / Subagents | skills / hooks (Pre/Post/Stop/SessionStart) / subagents / agent teams / tools reference | 7 | ⏳ 未着手 |
+| 2 | カスタマイズ — 記憶・設定・権限 | CLAUDE.md / auto memory / settings.json / permissions / output styles / statusline / sandboxing | 12 | ⏸ 保留 (Task 2 Topic 04 まで完了、Phase 3 へ寄り道) |
+| 3 | 拡張機能 — Skills / Hooks / Subagents | skills / hooks (Pre/Post/Stop/SessionStart) / subagents / agent teams / tools reference | 7 | 🚧 進行中 |
 | 4 | プラグイン化・配布・チーム連携・運用 | plugins / marketplace / GitHub Actions / GitLab CI / channels / routines / enterprise (Bedrock/Vertex/Foundry) / monitoring | 31 | ⏳ 未着手 |
 | 5 | 高度な統合 — MCP / Agent SDK | MCP接続 / 自作MCPサーバー / Agent SDK (Python/TS) / custom tools / sessions / structured outputs / ultraplan / ultrareview | 32 | ⏳ 未着手 |
 
@@ -22,7 +22,7 @@ Claude Code の学習が主目的。公式 docs/reference（全114ページ）�
 
 ## 現在の進捗
 
-**Phase 2 / Task 2**: 設定・権限（settings / permissions / permission-modes / env-vars / model-config）の学習段階。Task 1（記憶系）完了。進め方はトップダウン講義 + 小単元ごとにクイズ（[[feedback-practical-learning-emphasis]] / [[feedback-quiz-placement]]）。Phase 1 は Task 3 で中断・後回し。復習キューに Phase1-Task2 由来 6 件 + Phase2-Task1 由来 3 件が待機中。
+**Phase 3 開始**（2026-06-12 に Phase 2 / Task 2 を Topic 04 まで完了したところで寄り道）。拡張機能 (Skills / Hooks / Subagents / Agent Teams / Tools Reference) を 7 トピック構成で学習。進め方はトップダウン講義 + 小単元ごとにクイズ。Phase 2 残り (05 permissions / 06 permission-modes / 07 env-vars-and-model-config) は Phase 3 終了後に再開予定。Phase 1 は Task 3 で中断・さらに後回し。復習キューに Phase1 / Phase2 由来エントリ 9 件が待機中。
 
 ## タスクごとの学習フロー
 

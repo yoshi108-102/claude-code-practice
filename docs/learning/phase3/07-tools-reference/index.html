@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ツールリファレンス — Phase 3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 16px; line-height: 1.8; color: #1a1a1a; background: #fafafa; }
+    .site-header { border-bottom: 1px solid #e8e8e8; padding: 12px 0; background: #fff; }
+    .site-header-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; font-size: 13px; color: #666; }
+    .site-header-inner a { color: #3d7fc1; text-decoration: none; }
+    .site-header-inner a:hover { text-decoration: underline; }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; background: #fff; min-height: 100vh; }
+    .source-note { border-left: 3px solid #3d7fc1; background: #f0f5fb; padding: 10px 16px; border-radius: 0 4px 4px 0; font-size: 13px; color: #555; margin-bottom: 32px; }
+    .source-note a { color: #3d7fc1; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 20px; line-height: 1.35; border-bottom: 2px solid #3d7fc1; padding-bottom: 12px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+    h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 28px 0 10px; }
+    h4 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    p { margin-bottom: 14px; }
+    strong { font-weight: 700; }
+    a { color: #3d7fc1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { margin: 0 0 14px 24px; }
+    li { margin-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13.5px; }
+    th { background: #f0f4f8; color: #333; font-weight: 700; text-align: left; padding: 8px 12px; border: 1px solid #dde3ea; }
+    td { padding: 8px 12px; border: 1px solid #dde3ea; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre { background: #f4f4f4; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 18px; overflow-x: auto; margin: 16px 0 24px; font-size: 13.5px; line-height: 1.6; }
+    code { font-family: 'Noto Sans Mono', 'Menlo', 'Consolas', monospace; }
+    p code, li code, td code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 3px; padding: 1px 5px; font-size: 13px; }
+    .footer-nav { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e8e8e8; font-size: 13px; color: #666; }
+    .footer-nav a { color: #3d7fc1; text-decoration: none; }
+    .auto-generated { margin-top: 40px; font-size: 12px; color: #aaa; font-style: italic; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">← <a href="../index.html">Phase 3 トップ</a></div>
+</header>
+<div class="container">
+
+  <h1>ツールリファレンス — 組み込みツール一覧と動作</h1>
+
+  <div class="source-note">
+    出典: <a href="https://code.claude.com/docs/en/tools-reference" target="_blank">Tools reference</a>（閲覧日 2026-06-12）<br>
+    このノートは公式ドキュメントの「tools-reference」を起点に、Claudeが自動生成した教材です。
+  </div>
+
+  <h2>概要</h2>
+  <p>Claude Code が使える組み込みツールのリファレンス。ツール名は permissions ルール・サブエージェント tool リスト・hook matcher で使う正確な文字列。ツールを完全無効化するには permission settings の <code>deny</code> 配列に名前を追加する。</p>
+
+  <h2>公式 docs に沿った解説</h2>
+
+  <h3>ツール一覧</h3>
+  <table>
+    <thead><tr><th>ツール</th><th>説明</th><th>パーミッション必要</th></tr></thead>
+    <tbody>
+      <tr><td><code>Agent</code></td><td>サブエージェントをスポーン（独立コンテキスト）</td><td>No</td></tr>
+      <tr><td><code>AskUserQuestion</code></td><td>複数選択の質問</td><td>No</td></tr>
+      <tr><td><code>Bash</code></td><td>シェルコマンドを実行</td><td>Yes</td></tr>
+      <tr><td><code>CronCreate</code></td><td>定期・ワンショットプロンプトをスケジュール</td><td>No</td></tr>
+      <tr><td><code>Edit</code></td><td>ファイルへのターゲット編集</td><td>Yes</td></tr>
+      <tr><td><code>EnterPlanMode</code></td><td>Plan モードに切り替え</td><td>No</td></tr>
+      <tr><td><code>EnterWorktree</code></td><td>隔離 git worktree を作成して切り替え</td><td>No</td></tr>
+      <tr><td><code>ExitPlanMode</code></td><td>プランを提示して Plan モードを終了</td><td>Yes</td></tr>
+      <tr><td><code>Glob</code></td><td>パターンマッチングでファイルを検索</td><td>No</td></tr>
+      <tr><td><code>Grep</code></td><td>ファイル内容でパターンを検索</td><td>No</td></tr>
+      <tr><td><code>LSP</code></td><td>言語サーバー経由のコードインテリジェンス</td><td>No</td></tr>
+      <tr><td><code>Monitor</code></td><td>バックグラウンドコマンドの出力を Claude に返す</td><td>Yes</td></tr>
+      <tr><td><code>NotebookEdit</code></td><td>Jupyter notebook セルを変更</td><td>Yes</td></tr>
+      <tr><td><code>PowerShell</code></td><td>PowerShell コマンドをネイティブ実行</td><td>Yes</td></tr>
+      <tr><td><code>PushNotification</code></td><td>デスクトップ（およびスマートフォン）通知を送信</td><td>No</td></tr>
+      <tr><td><code>Read</code></td><td>ファイル内容を読み取る</td><td>No</td></tr>
+      <tr><td><code>RemoteTrigger</code></td><td>claude.ai 上で Routines を作成・実行</td><td>No</td></tr>
+      <tr><td><code>SendMessage</code></td><td>Agent team チームメイトにメッセージ / サブエージェントを再開</td><td>No</td></tr>
+      <tr><td><code>Skill</code></td><td>Skill を main 会話内で実行</td><td>Yes</td></tr>
+      <tr><td><code>TaskCreate</code></td><td>タスクリストに新しいタスクを作成</td><td>No</td></tr>
+      <tr><td><code>TaskGet</code></td><td>特定タスクの詳細を取得</td><td>No</td></tr>
+      <tr><td><code>TaskList</code></td><td>全タスクとその状態をリスト</td><td>No</td></tr>
+      <tr><td><code>TaskStop</code></td><td>実行中のバックグラウンドタスクを停止</td><td>No</td></tr>
+      <tr><td><code>TaskUpdate</code></td><td>タスクのステータス・依存関係・詳細を更新</td><td>No</td></tr>
+      <tr><td><code>TeamCreate</code></td><td>Agent team を複数チームメイトで作成</td><td>No</td></tr>
+      <tr><td><code>TeamDelete</code></td><td>Agent team を解散</td><td>No</td></tr>
+      <tr><td><code>ToolSearch</code></td><td>遅延ツールを検索・ロード</td><td>No</td></tr>
+      <tr><td><code>WebFetch</code></td><td>URL からコンテンツを取得</td><td>Yes</td></tr>
+      <tr><td><code>WebSearch</code></td><td>Web 検索を実行</td><td>Yes</td></tr>
+      <tr><td><code>Workflow</code></td><td>動的ワークフローを実行</td><td>Yes</td></tr>
+      <tr><td><code>Write</code></td><td>ファイルを作成または上書き</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+
+  <h3>パーミッションルールの形式</h3>
+  <table>
+    <thead><tr><th>ルール形式</th><th>適用先</th></tr></thead>
+    <tbody>
+      <tr><td><code>Bash(npm run *)</code></td><td>Bash, Monitor</td></tr>
+      <tr><td><code>Read(~/secrets/**)</code></td><td>Read, Grep, Glob, LSP</td></tr>
+      <tr><td><code>Edit(/src/**)</code></td><td>Edit, Write, NotebookEdit</td></tr>
+      <tr><td><code>Skill(deploy *)</code></td><td>Skill</td></tr>
+      <tr><td><code>Agent(Explore)</code></td><td>Agent</td></tr>
+      <tr><td><code>WebFetch(domain:example.com)</code></td><td>WebFetch</td></tr>
+      <tr><td><code>WebSearch</code></td><td>WebSearch（指定子なし）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>重要なツール動作詳細</h3>
+
+  <h4>Edit ツール — 3 つのチェック</h4>
+  <ol>
+    <li><strong>Read-before-edit</strong>: 現在の会話でファイルを読んでいること</li>
+    <li><strong>Match</strong>: <code>old_string</code> がファイルにそのまま存在すること</li>
+    <li><strong>Uniqueness</strong>: <code>old_string</code> がファイルに 1 回だけ登場すること</li>
+  </ol>
+
+  <h4>Bash ツールの永続性ルール</h4>
+  <ul>
+    <li><code>cd</code> は main セッションでは後続コマンドに引き継がれる（プロジェクトディレクトリ内のみ）</li>
+    <li>環境変数は引き継がれない</li>
+    <li>タイムアウト: デフォルト 2 分（最大 10 分）</li>
+    <li>出力長: デフォルト 30,000 文字（上限 150,000 文字）</li>
+  </ul>
+
+  <h4>Glob vs Grep の .gitignore 動作の違い</h4>
+  <ul>
+    <li><strong>Glob</strong>: デフォルトで .gitignore を<strong>無視</strong>（gitignore されたファイルも見つかる）</li>
+    <li><strong>Grep</strong>: デフォルトで .gitignore を<strong>尊重</strong>（gitignore されたファイルはスキップ）</li>
+  </ul>
+
+  <h4>WebFetch はロッシー</h4>
+  <p>HTML を Markdown に変換してから小型モデルで処理する。生データが必要なら <code>curl</code> via Bash を使う。</p>
+
+  <h2>重要ポイント</h2>
+  <ul>
+    <li>ツール名は正確な文字列（大文字小文字を区別）</li>
+    <li><code>Edit(...)</code> の allow ルールは同じパスへの <code>Read(...)</code> も自動許可する</li>
+    <li>Hook の <code>matcher</code> はベアのツール名（括弧なし）。permissions ルールとは形式が異なる</li>
+    <li>Read-before-edit: Edit も Write も事前に Read していないと失敗する</li>
+    <li>Glob は .gitignore を無視、Grep は尊重（デフォルト動作が逆）</li>
+  </ul>
+
+  <h2>コード例 / 図</h2>
+
+  <h3>ツール制御の組み合わせ例</h3>
+  <pre><code>{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Read(~/projects/**)",
+      "WebFetch(domain:docs.example.com)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Read(~/.ssh/**)"
+    ]
+  }
+}</code></pre>
+
+  <h2>関連・深掘り（reference）</h2>
+  <p>（<code>lesson</code> 中に Q&amp;A が発生したら、同ディレクトリ <code>reference/</code> 配下に md+html で追加され、ここにリンクされます）</p>
+
+  <h2>Phase 3 完了</h2>
+  <p>Phase 3（拡張機能）の全 7 トピックが完了しました。</p>
+  <ul>
+    <li><a href="../index.html">Phase 3 トップへ</a></li>
+  </ul>
+
+  <div class="footer-nav">← <a href="../main.md">Phase 3 Markdown 目次（main.md）</a></div>
+  <p class="auto-generated">Auto-generated at 2026-06-12 via /learning-flow:material（公式docs駆動）</p>
+
+</div>
+</body>
+</html>

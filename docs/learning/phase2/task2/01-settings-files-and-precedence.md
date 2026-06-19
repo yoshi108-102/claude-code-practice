@@ -1,3 +1,4 @@
+<!-- DEPRECATED: 新版は ../04-settings-files-and-precedence/index.md（HTML 版は index.html）-->
 # 01. settings.json の階層と優先順位
 
 > 出典: [Claude Code settings](https://code.claude.com/docs/en/settings)（閲覧日 2026-05-22）
