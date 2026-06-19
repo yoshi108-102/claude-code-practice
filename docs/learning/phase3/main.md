@@ -9,7 +9,7 @@
 
 | # | トピック | 内容 | リンク |
 |---|---|---|---|
-| 01 | features-overview | 全拡張機能の概観・選択指針 | [index.md](01-features-overview/index.md) |
+| 01 | features-overview | 全拡張機能の概観・選択指針 | [index.md](01-features-overview/index.md) `[done]` `[quiz:skip(概要)]` |
 | 02 | skills-deep-dive | Skills の詳細・フロントマター全フィールド | [index.md](02-skills-deep-dive/index.md) |
 | 03 | hooks-fundamentals | Hook ライフサイクル・28イベント・設定 | [index.md](03-hooks-fundamentals/index.md) |
 | 04 | hooks-io-and-patterns | Hook の JSON I/O・決定制御・実践パターン | [index.md](04-hooks-io-and-patterns/index.md) |

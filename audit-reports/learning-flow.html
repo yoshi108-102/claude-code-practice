@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>監査レポート: learning-flow プラグイン</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1a1a; --sub:#6b6b6b; --line:#e6e6e6; --accent:#2f7d6b; --bg:#ffffff;
+    --hi:#c0392b; --med:#b8860b; --low:#7a7a7a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", sans-serif;
+    line-height:1.9; font-size:16px; }
+  main { max-width:720px; margin:0 auto; padding:64px 24px 120px; }
+  h1 { font-size:1.7rem; font-weight:700; line-height:1.5; margin:0 0 8px; }
+  h2 { font-size:1.25rem; font-weight:700; margin:56px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--accent); }
+  h3 { font-size:1.05rem; font-weight:500; margin:32px 0 8px; }
+  p, li { color:var(--ink); }
+  .meta { color:var(--sub); font-size:.85rem; margin-bottom:8px; }
+  .verdict { display:flex; gap:12px; flex-wrap:wrap; margin:20px 0 8px; }
+  .chip { border:1px solid var(--line); border-radius:999px; padding:6px 14px; font-size:.85rem; }
+  .chip b { font-weight:700; }
+  code { background:#f4f4f4; padding:2px 6px; border-radius:4px; font-size:.88em;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  pre { background:#f7f7f7; border:1px solid var(--line); border-radius:8px; padding:16px;
+    overflow-x:auto; line-height:1.6; }
+  pre code { background:none; padding:0; }
+  .finding { border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin:16px 0; }
+  .badge { display:inline-block; font-size:.72rem; font-weight:700; color:#fff; border-radius:5px;
+    padding:2px 8px; margin-right:8px; vertical-align:middle; letter-spacing:.03em; }
+  .b-high { background:var(--hi); } .b-med { background:var(--med); } .b-low { background:var(--low); }
+  .finding .loc { color:var(--sub); font-size:.82rem; word-break:break-all; }
+  .finding dt { font-weight:700; margin-top:8px; font-size:.9rem; color:var(--accent); }
+  .finding dd { margin:2px 0 0; }
+  ul { padding-left:1.3em; }
+  hr { border:none; border-top:1px solid var(--line); margin:48px 0; }
+  .top3 li { margin-bottom:10px; }
+  footer { color:var(--sub); font-size:.8rem; margin-top:64px; border-top:1px solid var(--line); padding-top:16px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="meta">audit-skill / Claude Code 拡張機能の静的監査（読み取り専用）</p>
+  <h1>監査レポート: learning-flow プラグイン</h1>
+  <p class="meta">対象: learning-flow 0.1.0（全8スキル）／ 監査方式: Explore サブエージェントによる読み取り専用・静的スキャン（invoke なし）</p>
+
+  <div class="verdict">
+    <span class="chip"><b>安全性:</b> ✅ 合格</span>
+    <span class="chip"><b>品質:</b> ⚠️ 要改善</span>
+    <span class="chip"><b>指摘:</b> High 2 / Medium 5 / Low 3</span>
+  </div>
+
+  <h2>総評</h2>
+  <p>構造的に堅牢で、コマンドインジェクション・機密漏洩・過剰権限といった<strong>安全性上の重大欠陥は無い</strong>。責務分離（material→lesson→quiz→grade→reference）と <code>learning-flow-rules</code> を中核に据えた一貫性が良い。一方で、確認ポイントの曖昧さ・Web 検索失敗時のフォールバック・受動性と前提チェックのバランスに改善余地がある。</p>
+
+  <h2>監査対象ファイル</h2>
+  <pre><code>~/.claude/plugins/cache/yoshi108-plugins/learning-flow/0.1.0/skills/
+├── init/SKILL.md            ├── grade/SKILL.md
+├── lesson/SKILL.md          ├── reference/SKILL.md
+├── material/SKILL.md        ├── status/SKILL.md
+├── quiz/SKILL.md            └── learning-flow-rules/SKILL.md
+└── init/templates/ (3 files)</code></pre>
+
+  <h2>指摘（重大度順）</h2>
+
+  <div class="finding">
+    <h3><span class="badge b-high">HIGH</span>status の復習キュー強制実行</h3>
+    <p class="loc">status/SKILL.md:18 ／ learning-flow-rules ルール7</p>
+    <dl>
+      <dt>問題</dt><dd>セッション開始判定が「<code>/status</code> が叩かれた時」と広く、進捗確認だけのつもりでも復習キュー全件の再出題が走り得る。大量時はコンテキスト浪費・疲労。</dd>
+      <dt>修正案</dt><dd>待機中が5件以上なら「復習 {N}件あります。再出題しますか？」で確認し、(a) 選択時のみ実行。status は進捗表示に専念。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-high">HIGH</span>material / reference の確認不足 vs 受動性</h3>
+    <p class="loc">material/SKILL.md:62-74 ／ reference/SKILL.md:39-53</p>
+    <dl>
+      <dt>問題</dt><dd>「極端に大きい範囲のみ確認」の基準が曖昧で、大量教材が無確認生成され得る。reference 自動発動条件（2往復・締め）も定性的で判定がぶれる。</dd>
+      <dt>修正案</dt><dd>material はチャンク計画に「{N}トピック・所要 {X}分」を明示し15枚以上は強制確認。reference は保存前に1行確認を挟む。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-med">MEDIUM</span>WebSearch 失敗時の参考URL未確定</h3>
+    <p class="loc">quiz/SKILL.md:84-92 ／ grade/SKILL.md:100</p>
+    <dl>
+      <dt>問題</dt><dd>参考URLが見つからない問題も「（要確認）」で残り得る。ルール5（参考URL必須）と矛盾し、後の復習で役立たない。</dd>
+      <dt>修正案</dt><dd>URL未確定の問題は出題候補から外す（問題数減で対応）。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-med">MEDIUM</span>grade の復習キュー重複排除が弱い</h3>
+    <p class="loc">grade/SKILL.md:230-234</p>
+    <dl>
+      <dt>問題</dt><dd>「同日付・同Q番号でスキップ」だが、Topic 違いで同日 Q1 が衝突し得る一意識別子が未定義。</dd>
+      <dt>修正案</dt><dd>識別子を <code>{date}-{phase}-{topic}-{qnum}</code> に統一。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-med">MEDIUM</span>learning-flow-rules に実装チェックリスト欠落</h3>
+    <p class="loc">learning-flow-rules/SKILL.md 全体</p>
+    <dl>
+      <dt>問題</dt><dd>各スキルがルール呼び出しを重複指示。どのスキルが何の責務でルールを呼ぶかの分離表が曖昧。</dd>
+      <dt>修正案</dt><dd>「実装チェックリスト」節を追加し、各スキルの呼び出しタイミングを一覧化（重複は許容しセッション1回保証）。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-med">MEDIUM</span>init のテーマスラグ生成が曖昧</h3>
+    <p class="loc">init/SKILL.md:105-116</p>
+    <dl>
+      <dt>問題</dt><dd>日本語テーマの英訳/ローマ字の判定基準が無く、毎回ユーザー確認になりがち。</dd>
+      <dt>修正案</dt><dd>「自動で英訳、無ければ『スラグ案: {slug} で良い?』と確認」と明示。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-med">MEDIUM</span>lesson の自動発動・同期ポイントが曖昧</h3>
+    <p class="loc">lesson/SKILL.md:19-24</p>
+    <dl>
+      <dt>問題</dt><dd>起動トリガの「等」が曖昧。確認を出した後にユーザー応答を待つ保証が明文化されていない。</dd>
+      <dt>修正案</dt><dd>「明示的な y/OK/進めて を受けるまでステップ3に進まない」と明記。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-low">LOW</span>reference の theme 命名規則が曖昧</h3>
+    <p class="loc">reference/SKILL.md:40-44</p>
+    <dl>
+      <dt>問題</dt><dd>kebab-case の粒度・長さ基準が無く、同名衝突処理も未定義。</dd>
+      <dt>修正案</dt><dd>同名があれば <code>-v2</code> suffix、または <code>AskUserQuestion</code> で修正を促す。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-low">LOW</span>grade の次Task/次Phase 判定が不明瞭</h3>
+    <p class="loc">grade/SKILL.md:161-176</p>
+    <dl>
+      <dt>問題</dt><dd>次が同Phase内Taskか次Phaseかの判定ロジックが手順に明示されていない。</dd>
+      <dt>修正案</dt><dd>「現Taskがphase最後か → Yes:Phase完了 / No:同Phase次Task」の判定フローを追加。</dd>
+    </dl>
+  </div>
+
+  <div class="finding">
+    <h3><span class="badge b-low">LOW</span>material の出典がメタデータ化されていない</h3>
+    <p class="loc">material/SKILL.md:80-85</p>
+    <dl>
+      <dt>問題</dt><dd>出典を本文 blockquote で持つため、後で quiz/grade が正規表現で確実に抽出しづらい。</dd>
+      <dt>修正案</dt><dd>教材 md の先頭 frontmatter に <code>source_url</code> / <code>source_date</code> を持たせ、取得はそこから。</dd>
+    </dl>
+  </div>
+
+  <h2>良い点</h2>
+  <ul>
+    <li>責務分離が明確（material→lesson→quiz→grade→reference）。混在が無い。</li>
+    <li>「勝手に進めない」を各スキルが繰り返し強調。init/lesson で明示確認。</li>
+    <li>quiz が Topic 単位／Task まとめの2モードで柔軟。</li>
+    <li>material・reference・grade が重複検出・上書き確認を記述（冪等性への配慮）。</li>
+    <li>learning-flow-rules を中核に全スキルが一貫してルールを参照。</li>
+    <li>教材・reference の md+HTML 二本立て設計。</li>
+    <li>破壊的操作（apply/destroy）は Claude が実行せず手順提示に留める安全設計。</li>
+  </ul>
+
+  <h2>優先対応トップ3</h2>
+  <ol class="top3">
+    <li><strong>[HIGH] status の復習キュー強制実行を緩和</strong> — 5件以上は確認を挟み、status は進捗表示に専念。</li>
+    <li><strong>[HIGH] material/reference の確認ポイント明確化</strong> — 分量明示＋15枚以上強制確認、reference は保存前1行確認。</li>
+    <li><strong>[MEDIUM] WebSearch 失敗時はURL未確定問題を出題対象から外す</strong> — ルール5との矛盾を解消。</li>
+  </ol>
+
+  <footer>
+    Generated by <code>/audit-skill learning-flow --html:localhost</code> ・ 読み取り専用・静的監査（対象は invoke していません）<br>
+    このページはローカル限定サーバ（127.0.0.1）で配信されています。確認後は <code>lsof -ti tcp:8723 | xargs kill</code> で停止できます。
+  </footer>
+</main>
+</body>
+</html>

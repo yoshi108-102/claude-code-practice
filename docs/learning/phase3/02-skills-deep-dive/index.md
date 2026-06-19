@@ -338,7 +338,7 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/visualize.py .
 
 ## 関連・深掘り（reference）
 
-- （`lesson` 中に Q&A が発生したら、同ディレクトリ `reference/` 配下に md+html で追加され、ここにリンクされます）
+- [Skill のシェルインジェクションと監査スキル（audit-skill）](reference/skill-shell-injection-and-audit-skill.md)（[HTML](reference/skill-shell-injection-and-audit-skill.html)）
 
 ## 次のトピック
 

